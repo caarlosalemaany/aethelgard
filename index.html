@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crónicas de Aethelgard · Perster, Año 1332</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a120a;
+  --bg:#14100a;
+  --bg2:#1e1710;
+  --parch:#e6d5ac;
+  --parch-dark:#d4bf8e;
+  --parch-deep:#c4ab74;
+  --gold:#c9a227;
+  --gold-dim:#8f7424;
+  --gold-bright:#e8c95a;
+  --brown:#3b2a18;
+  --brown-light:#5a4226;
+  --red-seal:#7a2018;
+  --text-light:#d8c9a3;
+  --text-dim:#9c8c66;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(201,162,39,.05), transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(122,32,24,.06), transparent 50%);
+  color:var(--text-light);
+  font-family:'EB Garamond',Georgia,serif;
+  font-size:18px;
+  line-height:1.55;
+  min-height:100vh;
+}
+h1,h2,h3,h4{font-family:'Cinzel',serif;color:var(--gold);font-weight:700;letter-spacing:.04em}
+
+/* ============ HEADER ============ */
+header{
+  border-bottom:3px double var(--gold-dim);
+  background:linear-gradient(180deg,#241a0f 0%,var(--bg) 100%);
+  padding:22px 16px 14px;
+  text-align:center;
+  position:relative;
+}
+header::after{
+  content:"✦ ✦ ✦";
+  display:block;color:var(--gold-dim);font-size:11px;letter-spacing:18px;margin-top:8px;
+}
+header h1{font-size:clamp(26px,4.5vw,44px);font-weight:900;text-shadow:0 2px 10px rgba(0,0,0,.7)}
+header .subtitle{color:var(--text-dim);font-style:italic;font-size:17px;margin-top:2px}
+nav.main-nav{display:flex;justify-content:center;gap:14px;margin-top:16px;flex-wrap:wrap}
+nav.main-nav button{
+  font-family:'Cinzel',serif;font-size:15px;font-weight:700;letter-spacing:.08em;
+  background:transparent;color:var(--text-dim);border:1px solid var(--gold-dim);
+  padding:9px 26px;cursor:pointer;transition:.25s;
+}
+nav.main-nav button:hover{color:var(--gold-bright);border-color:var(--gold)}
+nav.main-nav button.active{background:var(--gold-dim);color:#1a120a;border-color:var(--gold)}
+
+/* ============ LAYOUT ============ */
+main{max-width:1180px;margin:0 auto;padding:26px 16px 80px}
+.view{display:none}
+.view.active{display:block}
+
+/* tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:2px solid var(--gold-dim);margin-bottom:24px}
+.tabs button{
+  font-family:'Cinzel',serif;font-size:13.5px;font-weight:700;letter-spacing:.05em;
+  background:var(--bg2);color:var(--text-dim);border:1px solid #3a2d1b;border-bottom:none;
+  padding:10px 18px;cursor:pointer;transition:.2s;
+}
+.tabs button:hover{color:var(--gold-bright)}
+.tabs button.active{background:var(--gold-dim);color:#160f06;border-color:var(--gold-dim)}
+.tabpanel{display:none}
+.tabpanel.active{display:block;animation:fadein .3s}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ============ PARCHMENT PANELS ============ */
+.parchment{
+  background:
+    radial-gradient(ellipse at 18% 12%, rgba(120,90,40,.14), transparent 45%),
+    radial-gradient(ellipse at 85% 90%, rgba(100,70,30,.18), transparent 45%),
+    radial-gradient(ellipse at 50% 50%, var(--parch) 0%, var(--parch-dark) 75%, var(--parch-deep) 100%);
+  color:var(--ink);
+  border:1px solid #2c2010;
+  box-shadow:0 4px 22px rgba(0,0,0,.65), inset 0 0 60px rgba(90,60,20,.25);
+  padding:26px 30px;
+  position:relative;
+}
+.parchment h2,.parchment h3,.parchment h4{color:#4a3008}
+.parchment .small{font-size:15px;color:#5d4a28}
+.deco-corner::before,.deco-corner::after{
+  content:"❧";position:absolute;color:rgba(90,60,20,.45);font-size:22px;
+}
+.deco-corner::before{top:8px;left:12px}
+.deco-corner::after{bottom:8px;right:12px;transform:rotate(180deg)}
+
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px}
+
+/* accordion lore */
+details.lore{
+  background:
+    radial-gradient(ellipse at 70% 20%, rgba(120,90,40,.12), transparent 50%),
+    linear-gradient(165deg,var(--parch) 0%,var(--parch-dark) 100%);
+  color:var(--ink);border:1px solid #30240f;
+  box-shadow:0 3px 14px rgba(0,0,0,.55), inset 0 0 40px rgba(90,60,20,.18);
+  margin-bottom:14px;
+}
+details.lore summary{
+  cursor:pointer;list-style:none;padding:15px 22px;
+  font-family:'Cinzel',serif;font-weight:700;font-size:17px;color:#4a3008;
+  display:flex;align-items:center;gap:12px;user-select:none;
+}
+details.lore summary::before{content:"✠";color:var(--gold-dim);font-size:15px;transition:.2s}
+details.lore[open] summary::before{transform:rotate(45deg)}
+details.lore summary .sub{font-family:'EB Garamond',serif;font-weight:400;font-style:italic;font-size:14.5px;color:#6b5630;margin-left:auto;text-align:right}
+details.lore .body{padding:4px 26px 22px;border-top:1px solid rgba(90,60,20,.35)}
+details.lore .body p{margin:10px 0}
+details.lore .body ul{margin:8px 0 8px 22px}
+details.lore .body strong{color:#4a3008}
+details.lore .body em{color:#5d4a28}
+.lore-search{
+  width:100%;padding:11px 16px;margin-bottom:18px;
+  background:var(--bg2);color:var(--text-light);border:1px solid var(--gold-dim);
+  font-family:'EB Garamond',serif;font-size:17px;
+}
+.lore-search::placeholder{color:var(--text-dim);font-style:italic}
+
+/* ============ FORMS ============ */
+label.f{display:block;font-family:'Cinzel',serif;font-size:12.5px;font-weight:700;letter-spacing:.07em;color:var(--gold);margin:14px 0 5px}
+input[type=text],input[type=password],input[type=number],select,textarea{
+  width:100%;padding:10px 13px;
+  background:#100c07;color:var(--text-light);
+  border:1px solid #4a3a20;font-family:'EB Garamond',serif;font-size:17px;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
+textarea{resize:vertical;min-height:90px}
+select{cursor:pointer}
+.btn{
+  font-family:'Cinzel',serif;font-weight:700;font-size:14px;letter-spacing:.08em;
+  background:linear-gradient(180deg,#a3801f,#7d621a);color:#16100a;
+  border:1px solid var(--gold-bright);padding:11px 28px;cursor:pointer;transition:.2s;
+  margin-top:16px;
+}
+.btn:hover{filter:brightness(1.18)}
+.btn:disabled{opacity:.45;cursor:wait}
+.btn.ghost{background:transparent;color:var(--gold);border:1px solid var(--gold-dim);}
+.btn.ghost:hover{border-color:var(--gold);color:var(--gold-bright)}
+.btn.danger{background:linear-gradient(180deg,#6e231b,#4d1812);color:#e8d0c8;border-color:#8f3a30}
+.btn.sm{padding:6px 14px;font-size:12px;margin-top:8px}
+
+.gen-layout{display:grid;grid-template-columns:330px 1fr;gap:24px;align-items:start}
+@media(max-width:880px){.gen-layout{grid-template-columns:1fr}}
+.gen-form{background:var(--bg2);border:1px solid #3a2d1b;padding:20px 22px 24px}
+.gen-output{min-height:260px}
+.gen-output .placeholder{color:#6b5630;font-style:italic;text-align:center;padding:70px 20px}
+.gen-output h3{margin:14px 0 6px}
+.gen-output p{margin:8px 0}
+.gen-output ul{margin:6px 0 6px 22px}
+.spinner{text-align:center;padding:60px 0;color:#6b5630;font-style:italic;font-size:19px}
+.spinner::before{content:"✦";display:block;font-size:30px;color:var(--gold-dim);animation:spin 1.6s linear infinite;margin-bottom:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-box{background:#2a0f0a;border:1px solid #7a2018;color:#e0a89c;padding:14px 18px;margin-top:14px;font-size:16px}
+
+/* ============ MAP ============ */
+#map,#worldmap{height:560px;border:3px double var(--gold-dim);box-shadow:0 4px 26px rgba(0,0,0,.7);background:#cbb583}
+#worldmap{background:#9db8c9}
+.leaflet-popup-content-wrapper{
+  background:linear-gradient(160deg,var(--parch),var(--parch-dark));color:var(--ink);
+  border-radius:2px;border:1px solid #4a3008;font-family:'EB Garamond',serif;
+  box-shadow:0 4px 18px rgba(0,0,0,.6);
+}
+.leaflet-popup-content{font-size:16px;line-height:1.45;margin:14px 18px}
+.leaflet-popup-content h3{font-family:'Cinzel',serif;color:#4a3008;font-size:16px;margin-bottom:6px}
+.leaflet-popup-tip{background:var(--parch-dark)}
+.map-marker{
+  background:radial-gradient(circle,var(--gold-bright),var(--gold-dim));
+  border:2px solid #3b2a18;border-radius:50%;width:18px!important;height:18px!important;
+  box-shadow:0 0 10px rgba(232,201,90,.8);
+}
+.map-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.map-legend button{
+  font-family:'EB Garamond',serif;font-size:15px;background:var(--bg2);color:var(--text-light);
+  border:1px solid var(--gold-dim);padding:6px 14px;cursor:pointer;
+}
+.map-legend button:hover{color:var(--gold-bright);border-color:var(--gold)}
+
+/* ============ DIARY / CHARACTERS ============ */
+.diary-entry{margin-bottom:26px}
+.diary-entry .session-meta{font-family:'Cinzel',serif;font-size:13px;color:var(--gold-dim);letter-spacing:.1em;margin-bottom:4px}
+.diary-entry h3{font-size:22px;margin-bottom:10px}
+.char-card h3{font-size:20px}
+.char-card .char-meta{font-family:'Cinzel',serif;font-size:12.5px;letter-spacing:.06em;color:#6b5630;margin:4px 0 12px}
+.char-card .label{font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;letter-spacing:.1em;color:#7a6232;display:block;margin-top:10px}
+
+/* ============ DM GATE ============ */
+.gate{max-width:430px;margin:60px auto;text-align:center}
+.gate .seal{font-size:54px;color:var(--red-seal);text-shadow:0 0 22px rgba(122,32,24,.6);margin-bottom:10px}
+.gate p{color:var(--text-dim);font-style:italic;margin:12px 0 4px}
+.gate-error{color:#d07060;margin-top:12px;font-style:italic;min-height:24px}
+
+/* ============ SESSION MANAGER ============ */
+.session-card{background:var(--bg2);border:1px solid #3a2d1b;padding:20px 24px;margin-bottom:20px}
+.session-card .head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.session-card .head input[type=text]{flex:1;min-width:180px}
+.session-card .head .num{font-family:'Cinzel',serif;color:var(--gold);font-weight:900;font-size:22px;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chips label{
+  font-size:15px;background:#100c07;border:1px solid #4a3a20;padding:5px 12px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;color:var(--text-dim);transition:.15s;
+}
+.chips label:has(input:checked){border-color:var(--gold);color:var(--gold-bright);background:#241c0d}
+.chips input{accent-color:var(--gold)}
+.hint{font-size:15px;color:var(--text-dim);font-style:italic;margin-top:6px}
+.divider{border:none;border-top:1px solid #3a2d1b;margin:26px 0}
+.flex-between{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.saved-flash{color:#8fae6b;font-size:14px;font-style:italic;opacity:0;transition:opacity .3s}
+.saved-flash.show{opacity:1}
+
+.dm-banner{
+  background:#241204;border:1px solid var(--red-seal);color:#d8a89c;
+  padding:10px 18px;margin-bottom:22px;font-size:15.5px;text-align:center;font-style:italic;
+}
+.quote{
+  text-align:center;font-style:italic;color:var(--text-dim);max-width:640px;margin:0 auto 28px;
+  font-size:19px;
+}
+.quote::before{content:"« "}.quote::after{content:" »"}
+footer{text-align:center;color:#5a4a30;font-size:14px;font-style:italic;padding:30px 0;border-top:1px solid #2a2012}
+@media(max-width:640px){
+  body{font-size:16.5px}
+  .parchment{padding:20px 18px}
+  #map{height:420px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CRÓNICAS DE AETHELGARD</h1>
+  <div class="subtitle">Perster · Año 1332 · «El Ojo está abierto, y en Su mirada, hay Paz.»</div>
+  <nav class="main-nav">
+    <button id="nav-players" class="active" onclick="showView('players')">⚜ Jugadores</button>
+    <button id="nav-dm" onclick="showView('dm')">🗝 Dungeon Master</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ================================================================ -->
+<!-- VISTA JUGADORES                                                  -->
+<!-- ================================================================ -->
+<section id="view-players" class="view active">
+  <p class="quote">Lo que sabéis es poco. Lo que ignoráis os mataría de saberlo... o eso dicen los clérigos.</p>
+
+  <div class="tabs">
+    <button class="active" data-tab="p-mundo">El Mundo Conocido</button>
+    <button data-tab="p-fe">La Fe</button>
+    <button data-tab="p-mapa">Mapa de Perster</button>
+    <button data-tab="p-gentes">Gentes de Perster</button>
+    <button data-tab="p-diario">Diario de Sesiones</button>
+    <button data-tab="p-fichas">Personajes</button>
+  </div>
+
+  <!-- ··· El mundo conocido ··· -->
+  <div id="p-mundo" class="tabpanel active">
+    <div class="parchment deco-corner">
+      <h2>Lo que todo habitante de Perster sabe</h2>
+      <p style="margin-top:14px"><strong>El pueblo.</strong> Perster es un pueblo pequeño del Gran Ducado de Bertonsia, rodeado por un muro que nadie cruza. Corre el año 1332. La vida transcurre entre la cosecha, el mercado de la Plaza Mayor, los sermones del Monasterio y la cerveza aguada de la taberna. Todo lo que llega de fuera —la sal, las telas, las herramientas— llega en los carros de la Iglesia. Nadie sale. Nadie entra, salvo los convoyes.</p>
+      <p><strong>La Miasma.</strong> Más allá de los muros, cubriendo el mundo entero, se extiende la Miasma: una niebla mortal que enferma y mata a quien respira en ella demasiado tiempo. Los muros y la protección de la Iglesia son lo único que mantiene a salvo a los pueblos. Eso es lo que se enseña desde la cuna, y nadie ha vivido lo bastante fuera como para contradecirlo.</p>
+      <p><strong>La Iglesia del Ojo de Lochom.</strong> La fe que rige todos los reinos. Su símbolo —un ojo abierto— preside templos, uniformes y edictos. Sus clérigos guían las almas, administran los diezmos, organizan los convoyes de suministros y mantienen a raya la oscuridad. Su brazo severo, la Inquisición, persigue la herejía allá donde florece. Se les debe respeto. Y, en voz baja, se les tiene miedo.</p>
+      <p><strong>Los Afligidos.</strong> No todos los habitantes del mundo son humanos. Existen gentes marcadas —cuernos, escamas, colmillos— a las que la Iglesia llama «Afligidos» y obliga a vivir apartadas, en barrios propios como el Gueto de Perster. La doctrina dice que su sangre lleva el eco de la catástrofe que trajo la Miasma. Lo que eso significa exactamente, ningún sermón lo aclara.</p>
+      <p><strong>La catástrofe.</strong> Hace unos seiscientos años, dice la doctrina, un desastre de origen misterioso azotó el mundo: un portal se abrió, trajo criaturas nunca vistas y la niebla mortal. Los reinos se unieron bajo la guía de la Iglesia para sobrevivir tras los muros. Desde entonces, el Ojo vela.</p>
+      <p class="small" style="margin-top:18px;text-align:center">— Esto es lo esencial. Abajo, todo lo que cualquier habitante de Perster sabría si le preguntaras. —</p>
+    </div>
+
+    <div style="margin-top:26px">
+      <details class="lore">
+        <summary>Así se ve Perster<span class="sub">el pueblo, barrio a barrio</span></summary>
+        <div class="body">
+          <p>Perster es piedra oscura, tejados puntiagudos que escurren la lluvia eterna de Bertonsia y calles que huelen a leña húmeda. Unos pocos miles de almas viven dentro del muro, organizadas en cuatro barrios que todo el mundo nombra sin pensar:</p>
+          <ul>
+            <li><strong>Market District</strong> — el centro: la Plaza Mayor, el mercado, los edictos y el gran Monasterio de la Santa Poda alzándose sobre todo lo demás, como manda la doctrina.</li>
+            <li><strong>Purple Well</strong> — el barrio del noroeste, pegado al bosque. Casas de artesanos, el viejo pozo que le da nombre y la Torre del Vigía asomada a los campos.</li>
+            <li><strong>Cotton Shade</strong> — el noreste: telares, lavanderas, posadas baratas y los carros que entran por el camino norte.</li>
+            <li><strong>Black Borough</strong> — el sur. El Gueto. Donde la Iglesia obliga a vivir a los Afligidos, y donde —dicen— se cuece la mejor sopa del Ducado.</li>
+          </ul>
+          <p>Más allá del muro: campos de labor hasta donde la Iglesia marca, el bosque, y después la línea gris donde nadie mira demasiado rato.</p>
+        </div>
+      </details>
+      <details class="lore">
+        <summary>El Gran Ducado de Bertonsia<span class="sub">nuestra tierra</span></summary>
+        <div class="body">
+          <p>Perster pertenece al <strong>Gran Ducado de Bertonsia</strong>: tierras bajas y pantanosas en el sur, colinas boscosas en el norte y un cielo perpetuamente nublado que hace de la lluvia una vecina más. Los pueblos son de piedra oscura, con calles estrechas y el templo siempre como edificio más alto, visible desde cualquier punto.</p>
+          <p>Es tierra devota: se dice que hay un clérigo por cada doscientos habitantes, más que en ningún otro reino. La capital es <strong>Veynhold</strong>, donde reside el Duque, y a la que casi nadie de Perster ha ido jamás — viajar entre pueblos es cosa de los convoyes de la Iglesia, no de la gente corriente.</p>
+        </div>
+      </details>
+      <details class="lore">
+        <summary>Quién nos gobierna<span class="sub">del Duque al Padre Valerius</span></summary>
+        <div class="body">
+          <ul>
+            <li><strong>El Duque Aldric Veyne III</strong> gobierna Bertonsia desde Veynhold. Aristócrata refinado, gobierna a través de consejeros nombrados con la aprobación de la Iglesia. Su nombre se pronuncia en los edictos; su rostro, casi nadie lo ha visto.</li>
+            <li><strong>El Pontífice Supremo Caron Vel Ashe</strong>, el Papa, es la cabeza de la Iglesia del Ojo de Lochom y, en la práctica, la autoridad sobre todos los reinos. Lleva treinta años en el cargo y gobierna desde la Sede del Ojo, en la lejana Ilmzois. Para un vecino de Perster es poco más que un nombre sagrado en los sermones.</li>
+            <li><strong>El Padre Valerius</strong> es la máxima autoridad real de Perster: nada se mueve en el pueblo sin su bendición. Hombre de fe, bueno pero estricto, capaz de citar la doctrina para cada hora del día.</li>
+            <li><strong>El Capitán Silas</strong> comanda la guardia del pueblo: un veterano cansado que mantiene el orden con más suspiros que golpes... cuando puede.</li>
+          </ul>
+        </div>
+      </details>
+      <details class="lore">
+        <summary>Costumbres y festividades de Bertonsia<span class="sub">el año de un persterino</span></summary>
+        <div class="body">
+          <ul>
+            <li><strong>La Cosecha del Ojo</strong> (otoño) — la festividad grande del año: se cierra la temporada agrícola entregando a la Iglesia la décima parte de todo lo producido como ofrenda de gratitud. Música, comida comunitaria y un sermón que dura horas. La habéis vivido hace nada.</li>
+            <li><strong>El Día del Muro</strong> (primavera) — se conmemora el día en que «los muros salvaron al pueblo». Los niños pintan los muros con cal fresca y los adultos renuevan el voto de no cruzarlos. Hay dulces de miel y procesión.</li>
+            <li><strong>La Noche de las Velas</strong> (invierno) — la noche más larga del año, cada familia enciende una vela en su ventana para «guiar la luz del Ojo a través de la oscuridad». Las calles quedan iluminadas por miles de pequeñas llamas. Es, dicen todos, la noche más hermosa del año.</li>
+          </ul>
+          <p>A eso se suman los ritos de cada semana: el rezo del mediodía, el Ritual de la Sangre y la Sal en el templo, y el silencio respetuoso cuando pasa el convoy de la Iglesia.</p>
+        </div>
+      </details>
+      <details class="lore">
+        <summary>Los cinco reinos<span class="sub">lo que se enseña en la escuela del templo</span></summary>
+        <div class="body">
+          <p>La doctrina enseña que, cuando la catástrofe trajo la Miasma hace seiscientos años, los cinco reinos se unieron bajo la guía del Ojo para sobrevivir. Son nombres lejanos que un persterino conoce de los sermones y poco más:</p>
+          <ul>
+            <li><strong>El Gran Ducado de Bertonsia</strong> — nuestra tierra, gobernada por el Duque Aldric Veyne III.</li>
+            <li><strong>El Imperio Bramber</strong> — el reino más vasto, de calzadas antiguas y legiones. Su Emperador, <strong>Caius Dorn</strong>, es un viejo soldado de pelo blanco del que se dice que habla poco y no olvida nada.</li>
+            <li><strong>El Reino de Baresdonia</strong> — el norte duro, de bosques oscuros e inviernos crueles. Su rey, <strong>Edran Thal</strong>, heredó el trono muy joven tras la muerte repentina de su padre.</li>
+            <li><strong>La Tearquía de Gobgar</strong> — el corazón de la fe, donde está la Sede del Ojo. La gobiernan los <strong>Cuatro Tearcas</strong>, que se turnan el mando cada siete años. Su capital, Ilmzois, es —dicen— la ciudad más hermosa del mundo.</li>
+            <li><strong>El Principado de Ilm</strong> — el reino pequeño, famoso por sus jardines interiores. Gobierna la <strong>Princesa Regente Sova Mirn</strong> en nombre de su hijo, desde que enviudó hace unos años.</li>
+          </ul>
+          <p class="small">Ningún vecino de Perster ha visto jamás otro reino: todo esto se sabe porque lo cuenta la Iglesia, y la Iglesia no miente.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ··· La Fe (Breviario público) ··· -->
+  <div id="p-fe" class="tabpanel">
+    <div class="parchment deco-corner">
+      <h2>Breviario de la Fe: El Orden de la Luz</h2>
+      <p class="small" style="margin-top:4px">Año 1332 · Doctrina oficial de la Santa Iglesia · Distribuido en toda parroquia del Ojo</p>
+      <p style="margin-top:14px;font-style:italic;text-align:center">«No temas, pequeño rebaño; porque al Padre le ha placido daros el Reino. Dentro del muro hay vida; fuera, solo el olvido del cual fuisteis rescatados.»</p>
+      <h3 style="margin-top:20px">La Historia de la Salvación</h3>
+      <p>Hace más de 600 años, el mundo era un páramo de sombras sin nombre. Los hombres vagaban perdidos hasta que la <strong>Luz</strong> descendió. En Su infinita misericordia, levantó los Cinco Reinos y nos entregó los Muros para que el mal que acecha en el exterior no pudiera alcanzarnos.</p>
+      <p>No preguntemos qué hay más allá, pues la curiosidad es el primer paso hacia la oscuridad. Nos basta saber que: <em>aquí, bajo el Ojo, estamos a salvo.</em></p>
+      <h3 style="margin-top:20px">Los Seis Rostros de la Providencia</h3>
+      <p>Aunque la Luz es Una, se manifiesta en seis virtudes para guiarnos:</p>
+      <ul style="margin:8px 0 8px 22px">
+        <li><strong>Vultun (El Vigilante):</strong> el rostro del cuidado. Nos enseña que nunca estamos solos; Su mirada nos guía en la verdad y nos protege del error.</li>
+        <li><strong>Ixor (El Pastor):</strong> la disciplina necesaria. Como el pastor usa su vara para guiar a la oveja al redil, Ixor nos aleja del camino del pecado por nuestro propio bien.</li>
+        <li><strong>Ghorum (El Sembrador):</strong> la bendición de la tierra. A Él agradecemos el sudor de nuestra frente y el pan que llega a nuestras mesas. Es el dios del trabajo digno.</li>
+        <li><strong>Mornac (El Rostro del Silencio):</strong> la virtud de la humildad. Nos enseña que en el silencio de la oración encontramos la paz que el ruido del mundo nos quita.</li>
+        <li><strong>Stratos (El Cimiento):</strong> el orden de todas las cosas. Gracias a Él, cada hombre tiene un lugar y cada lugar tiene un hombre. La jerarquía es la base de la armonía.</li>
+        <li><strong>Kull (El Segador de Almas):</strong> la promesa del descanso. Al final de la jornada, Kull nos recoge para llevarnos de vuelta a la Luz, donde no hay más dolor ni llanto.</li>
+      </ul>
+      <h3 style="margin-top:20px">El Ritual de la Sangre y la Sal</h3>
+      <p>Este es nuestro vínculo más sagrado. La sal purifica la tierra; la sangre (el vino consagrado) une a la comunidad. Cuando compartimos el ritual, recordamos que todos somos un solo cuerpo. Quien rechaza la sal, rechaza a su hermano.</p>
+      <h3 style="margin-top:20px">El Bendito Año 1332</h3>
+      <p>Estamos en el <strong>Año de la Consumación</strong>. Es un tiempo de regocijo, pues las profecías dicen que este año la Luz brillará con más fuerza que nunca, limpiando los últimos rincones de duda en nuestros corazones. Es el año del gran sacrificio de amor: la entrega total de nuestra voluntad a la fe de los cielos.</p>
+      <h3 style="margin-top:20px">La Vida en la Parroquia</h3>
+      <p>La Iglesia es tu familia. Si tienes hambre, el templo tiene grano. Si estás triste, el clérigo tiene palabras de aliento. No vemos a los guardias como carceleros, sino como hermanos mayores que velan nuestro sueño.</p>
+      <p class="small" style="background:rgba(90,60,20,.12);padding:10px 14px;border-left:3px solid #8f7424"><strong>Doctrina sobre los «Afligidos»:</strong> aquellos que nacen con marcas diferentes (como los Tieflings o los Dracónidos) no son malditos, sino «Afligidos». Su carga es más pesada y su camino más difícil; por ello la Iglesia les pide más obediencia y humildad, para que la Luz pueda lavar sus impurezas antes de llegar a Kull.</p>
+      <h3 style="margin-top:20px">El «Afuera» (lo que no se nombra)</h3>
+      <p>No existen los demonios en nuestros libros; solo existe el <strong>Velo de la Oscuridad</strong>. Es un estado de no-existencia, una nada hambrienta que devora a los que se alejan de la Luz de Sanctus. Los «herejes» no son enemigos a los que odiar, sino almas perdidas que eligieron el frío sobre el calor del hogar de Lochom. Rezamos por ellos, para que su fin sea rápido.</p>
+      <p style="text-align:center;margin-top:22px;font-weight:600">«El Ojo está abierto, y en Su mirada, hay Paz.»</p>
+    </div>
+  </div>
+
+  <!-- ··· Gentes de Perster (público) ··· -->
+  <div id="p-gentes" class="tabpanel">
+    <div class="card-grid">
+      <div class="parchment char-card deco-corner">
+        <h3>Padre Valerius</h3>
+        <div class="char-meta">Humano · Máxima autoridad de Perster · Monasterio de la Santa Poda</div>
+        <p style="font-style:italic">«El Ojo está abierto, y en Su mirada, hay Paz. Recuérdalo, hijo, antes de hacer lo que ibas a hacer.»</p>
+        <p>El pastor de Perster y la mayor autoridad del pueblo: ni el alcalde ni la guardia mueven un dedo sin su bendición. Es un hombre de fe genuina — bueno, paciente con los débiles y generoso con el grano del templo — pero inflexible con las normas: la doctrina es la doctrina, y la cita de memoria, capítulo y versículo, para cada situación de la vida.</p>
+        <p>Conoce a cada familia de Perster por su nombre, oficia cada festividad y considera que la disciplina es la forma más alta de amor. Quien cumple, encuentra en él un protector. Quien se desvía, descubre que su voz suave puede helar una plaza entera.</p>
+        <p style="font-style:italic" class="small">Fue amigo cercano de la madre de Jared Aureus, y no lo oculta: el joven paladín es el «hijo predilecto» de su congregación.</p>
+      </div>
+      <div class="parchment char-card deco-corner">
+        <h3>La Tía Elga</h3>
+        <div class="char-meta">Tiefling · Matriarca del Gueto y Guardiana de la Sopa</div>
+        <p style="font-style:italic">«Yo no prometo cielos, pero mi pan está recién horneado.»</p>
+        <p>Una anciana tiefling de piel color teja desgastada y cuernos romos, limados por los años. Siempre tiene las manos y el delantal cubiertos de harina, un manojo de llaves pesadas a la cintura y un rodillo de madera que usa tanto para amasar como para echar de su puerta a los guardias demasiado curiosos.</p>
+        <p>Su cocina, en el corazón del Gueto, es el corazón latente de los barrios bajos de Perster: siempre hay humo en la chimenea y la puerta nunca tiene llave, pero nadie se atreve a entrar con malas intenciones — el barrio no lo permitiría. No regala sonrisas, pero jamás niega un plato de sopa a quien lo necesita.</p>
+        <p style="font-style:italic" class="small">«Cómete la sopa antes de que se enfríe, que las verdades amargas se pasan mejor con el vientre lleno.»</p>
+      </div>
+      <div class="parchment char-card deco-corner">
+        <h3>Golnar</h3>
+        <div class="char-meta">Humano · El viejo del Rincón de la Piedra Calva</div>
+        <p style="font-style:italic">«¿Vas a escupirme como los demás o vas a sentarte y escuchar?»</p>
+        <p>Un anciano que parece tallado en una raíz vieja: piel surcada de arrugas, barba blanca descuidada y unos ojos azul acero que analizan a todo el que se acerca. Vive en el límite del Gueto, en una choza que se sostiene más por terquedad que por arquitectura, donde el muro supura humedad.</p>
+        <p>En el pueblo lo llaman «el loco»: es el último descendiente del <em>Hereje de la Puerta Norte</em>, un linaje marcado por el estigma desde hace generaciones. Se presenta huraño y malhablado, abraza siempre un bulto bajo sus harapos y mira por encima del hombro buscando patrullas. Los niños le tienen miedo. Los viejos, lástima. Casi nadie lo escucha.</p>
+        <p style="font-style:italic" class="small">Dicen que quien le lleva tabaco o un respeto sincero descubre que el viejo gruñón sabe más historias que nadie en Perster.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ··· Mapa ··· -->
+  <div id="p-mapa" class="tabpanel">
+    <div id="map"></div>
+    <div class="map-legend" id="map-legend"></div>
+  </div>
+
+  <!-- ··· Diario ··· -->
+  <div id="p-diario" class="tabpanel">
+    <div id="public-diary"></div>
+  </div>
+
+  <!-- ··· Fichas ··· -->
+  <div id="p-fichas" class="tabpanel">
+    <div class="card-grid" id="public-chars"></div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- PUERTA DM                                                        -->
+<!-- ================================================================ -->
+<section id="view-dmgate" class="view">
+  <div class="gate parchment deco-corner">
+    <div class="seal">𝍕</div>
+    <h2>Archivo Reservado</h2>
+    <p>Solo para ojos del Dungeon Master.<br>«La verdad no desaparece cuando se la entierra.»</p>
+    <input type="password" id="dm-pass" placeholder="Palabra de paso..." style="margin-top:16px;background:#f0e4c4;color:#1a120a;border:1px solid #6b5630" onkeydown="if(event.key==='Enter')tryUnlock()">
+    <button class="btn" onclick="tryUnlock()">Romper el sello</button>
+    <div class="gate-error" id="gate-error"></div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- VISTA DM                                                         -->
+<!-- ================================================================ -->
+<section id="view-dm" class="view">
+  <div class="dm-banner">⚠ Archivo del Dungeon Master — nada de lo que aparece aquí debe ser visto por los jugadores.</div>
+
+  <div class="tabs">
+    <button class="active" data-tab="dm-lore">📜 Lore</button>
+    <button data-tab="dm-map">🗺 Mapa del Mundo</button>
+    <button data-tab="dm-enc">⚔ Encuentros</button>
+    <button data-tab="dm-pnj">👤 PNJs</button>
+    <button data-tab="dm-doc">✉ Documentos</button>
+    <button data-tab="dm-ses">🕯 Sesiones</button>
+    <button data-tab="dm-cfg">⚙ Ajustes</button>
+  </div>
+
+  <!-- ··· MAPA DEL MUNDO (solo DM) ··· -->
+  <div id="dm-map" class="tabpanel">
+    <p class="hint" style="margin-bottom:12px">⚠ El mapa de Aethelgard es información reservada: los personajes nunca han visto el mundo más allá de los muros de Perster.</p>
+    <div id="worldmap"></div>
+  </div>
+
+  <!-- ··· LORE ··· -->
+  <div id="dm-lore" class="tabpanel active">
+    <input class="lore-search" id="lore-search" type="text" placeholder="Buscar en las crónicas... (Malachar, Sudario, Ymalean, festividades...)">
+    <div class="tabs" id="lore-cats" style="border-bottom:1px solid #3a2d1b"></div>
+    <div id="lore-list"></div>
+  </div>
+
+  <!-- ··· ENCUENTROS ··· -->
+  <div id="dm-enc" class="tabpanel">
+    <div class="gen-layout">
+      <div class="gen-form">
+        <h3 style="font-size:16px">Generador de Encuentros</h3>
+        <label class="f">Nivel del grupo</label>
+        <input type="text" id="enc-level" value="2-3">
+        <label class="f">Número de jugadores</label>
+        <input type="number" id="enc-players" value="5" min="1" max="10">
+        <label class="f">Entorno</label>
+        <select id="enc-env">
+          <option>Dentro de Perster (callejones, edificios, el Gueto)</option>
+          <option>Alrededores del muro de Perster (campos, bosque cercano)</option>
+          <option>Cuevas y túneles bajo tierra</option>
+          <option>Exterior, en plena Miasma</option>
+          <option>Un convoy de la Iglesia en el camino</option>
+          <option>El Monasterio o un templo del Ojo</option>
+        </select>
+        <label class="f">Dificultad</label>
+        <select id="enc-diff">
+          <option>Fácil</option>
+          <option selected>Media</option>
+          <option>Difícil</option>
+          <option>Mortal</option>
+        </select>
+        <label class="f">Tema o detalle opcional</label>
+        <textarea id="enc-theme" placeholder="Ej.: relacionado con la Inquisición, con ghouls, con contrabando de sal..."></textarea>
+        <button class="btn" id="enc-btn" onclick="genEncounter()">Invocar encuentro</button>
+      </div>
+      <div class="parchment gen-output deco-corner" id="enc-out">
+        <div class="placeholder">El destino aguarda a ser escrito...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ··· PNJs ··· -->
+  <div id="dm-pnj" class="tabpanel">
+    <div class="gen-form" style="margin-bottom:24px">
+      <div class="flex-between">
+        <div>
+          <h3 style="font-size:16px">🎲 Generador de Almas de Perster (4d10)</h3>
+          <p class="hint">Cuatro dados: oficio, estado de ánimo, pequeño problema y rasgo distintivo. Un alma de Perster lista para hablar antes de que los jugadores parpadeen.</p>
+        </div>
+        <button class="btn sm" onclick="rollSoul()">Tirar 4d10</button>
+      </div>
+      <div id="soul-out" style="margin-top:14px"></div>
+    </div>
+    <div class="gen-layout">
+      <div class="gen-form">
+        <h3 style="font-size:16px">Generador de PNJs</h3>
+        <label class="f">Raza</label>
+        <select id="pnj-race">
+          <option>Cualquiera (decide la IA)</option>
+          <option>Humano</option>
+          <option>Tiefling</option>
+          <option>Dracónido</option>
+          <option>Orco / Semiorco</option>
+          <option>Elfo (de ciudad, discreto)</option>
+        </select>
+        <label class="f">Rol o ubicación</label>
+        <select id="pnj-role">
+          <option>Habitante de Perster</option>
+          <option>Vecino del Gueto</option>
+          <option>Clérigo o monje del Ojo</option>
+          <option>Agente de la Inquisición</option>
+          <option>Mercader del convoy de la Iglesia</option>
+          <option>Guardia del muro</option>
+          <option>Criminal o contrabandista</option>
+          <option>Noble o autoridad local</option>
+        </select>
+        <label class="f">Detalle opcional</label>
+        <textarea id="pnj-extra" placeholder="Ej.: que sepa algo del idioma antiguo, que tenga relación con la Tía Elga..."></textarea>
+        <button class="btn" id="pnj-btn" onclick="genNPC()">Dar vida al PNJ</button>
+      </div>
+      <div class="parchment gen-output deco-corner" id="pnj-out">
+        <div class="placeholder">Un rostro sin nombre espera en la niebla...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ··· DOCUMENTOS ··· -->
+  <div id="dm-doc" class="tabpanel">
+    <div class="gen-layout">
+      <div class="gen-form">
+        <h3 style="font-size:16px">Documentos de Ambientación</h3>
+        <label class="f">Tipo de documento</label>
+        <select id="doc-type">
+          <option>Edicto de la Iglesia del Ojo</option>
+          <option>Pergamino antiguo / fragmento de crónica</option>
+          <option>Nota o carta personal</option>
+          <option>Rumores de taberna (lista de 5)</option>
+          <option>Página del Códice de Elian (con fragmento en idioma antiguo)</option>
+          <option>Sermón dominical del Monasterio</option>
+          <option>Aviso público clavado en la Plaza Mayor</option>
+          <option>Lista de carga de un convoy de la Iglesia</option>
+        </select>
+        <label class="f">Tema o propósito</label>
+        <textarea id="doc-theme" placeholder="Ej.: que insinúe las purificaciones, que dé una pista hacia las cuevas, anuncio de la Noche de las Velas..."></textarea>
+        <button class="btn" id="doc-btn" onclick="genDoc()">Redactar documento</button>
+      </div>
+      <div class="parchment gen-output deco-corner" id="doc-out">
+        <div class="placeholder">La tinta espera a la pluma...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ··· SESIONES ··· -->
+  <div id="dm-ses" class="tabpanel">
+    <div class="gen-form" style="margin-bottom:24px">
+      <div class="flex-between">
+        <h3 style="font-size:16px">Estado actual de la trama</h3>
+        <span class="saved-flash" id="plot-saved">✓ guardado</span>
+      </div>
+      <textarea id="plot-state" style="min-height:120px;margin-top:10px" placeholder="¿Dónde está el grupo? ¿Qué hilos están abiertos? ¿Qué sabe ya cada jugador?"></textarea>
+    </div>
+    <div class="flex-between" style="margin-bottom:14px">
+      <h3>Sesiones</h3>
+      <div>
+        <button class="btn sm" onclick="newSession()">+ Nueva sesión</button>
+        <button class="btn sm" id="pub-btn" onclick="publishData()" style="margin-left:8px">📤 Publicar para los jugadores</button>
+      </div>
+    </div>
+    <p class="hint" id="pub-status" style="margin-bottom:6px"></p>
+    <p class="hint" style="margin-bottom:18px">El campo «Resumen público» de cada sesión es lo que aparece en el Diario de la sección de Jugadores: redáctalo desde el punto de vista de los personajes y <strong>sin spoilers</strong>. Las notas del DM y el estado de la trama son privados y solo viven en este navegador. Al pulsar <strong>📤 Publicar</strong> se sube a GitHub únicamente el contenido público (diario + fichas); los jugadores lo verán en uno o dos minutos.</p>
+    <div id="session-list"></div>
+  </div>
+
+  <!-- ··· AJUSTES ··· -->
+  <div id="dm-cfg" class="tabpanel">
+    <div class="gen-form" style="max-width:680px;margin-bottom:26px">
+      <h3 style="font-size:16px">Clave de la API de Google AI Studio (gratuita)</h3>
+      <p class="hint">Los generadores de IA (modelo <strong>gemini-2.5-flash</strong>) ya vienen configurados con la clave de la campaña: <strong>funcionan sin tocar nada</strong>. Si algún día quieres usar otra clave (gratis en <strong>aistudio.google.com/apikey</strong>), guárdala aquí; déjala vacía y guarda para volver a la de por defecto. No publiques esta página en internet: la clave viaja dentro del archivo.</p>
+      <label class="f">API Key (opcional, sobreescribe la de por defecto)</label>
+      <input type="password" id="api-key" placeholder="Usando la clave de la campaña">
+      <button class="btn sm" onclick="saveApiKey()">Guardar clave</button>
+      <span class="saved-flash" id="key-saved" style="margin-left:10px">✓ guardada</span>
+    </div>
+
+    <div class="gen-form" style="max-width:680px;margin-bottom:26px">
+      <h3 style="font-size:16px">Publicación en GitHub (diario y fichas)</h3>
+      <p class="hint">La web publicada lee el diario y las fichas desde <strong>data/public.json</strong> del repositorio. Configura esto una vez y el botón «📤 Publicar» del gestor de sesiones subirá los cambios por ti. Solo se publica contenido público: tus notas de DM y el estado de la trama <strong>nunca</strong> salen de este navegador.</p>
+      <label class="f">Usuario u organización de GitHub</label>
+      <input type="text" id="gh-owner" placeholder="p. ej. carlosalemany">
+      <label class="f">Nombre del repositorio</label>
+      <input type="text" id="gh-repo" placeholder="p. ej. aethelgard">
+      <label class="f">Rama</label>
+      <input type="text" id="gh-branch" placeholder="main">
+      <label class="f">Token de acceso (fine-grained, permiso «Contents: Read and write» solo en ese repo)</label>
+      <input type="password" id="gh-token" placeholder="github_pat_...">
+      <button class="btn sm" onclick="saveGhConfig()">Guardar configuración</button>
+      <span class="saved-flash" id="gh-saved" style="margin-left:10px">✓ guardada</span>
+      <p class="hint" style="margin-top:14px"><strong>Cómo montarlo (una sola vez):</strong> 1) crea una cuenta y un repositorio en github.com · 2) sube <em>index.html</em>, <em>Perster.png</em>, <em>Aethelgard.png</em> y la carpeta <em>data/</em> · 3) en Settings → Pages activa «Deploy from a branch» (rama main) · 4) crea el token en Settings → Developer settings → Personal access tokens → Fine-grained tokens, limitado a ese repo con permiso <em>Contents: Read and write</em> · 5) pégalo aquí. El token queda solo en este navegador.</p>
+    </div>
+
+    <div class="gen-form" style="margin-bottom:26px">
+      <div class="flex-between">
+        <h3 style="font-size:16px">Fichas públicas de los personajes</h3>
+        <button class="btn sm" onclick="newChar()">+ Añadir personaje</button>
+      </div>
+      <p class="hint">Estas fichas se muestran en la sección de Jugadores. Solo información que el grupo conoce abiertamente: nada de secretos ni orígenes ocultos. Recuerda pulsar «📤 Publicar» (en Sesiones) para que los jugadores vean los cambios.</p>
+      <div id="char-editor"></div>
+    </div>
+
+    <div class="gen-form" style="max-width:680px">
+      <h3 style="font-size:16px">Zona de peligro</h3>
+      <p class="hint">Borra todos los datos guardados (sesiones, fichas, clave API) y restaura los valores iniciales.</p>
+      <button class="btn danger sm" onclick="resetAll()">Restaurar todo</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>Crónicas de Aethelgard · Documento reservado · Año 1332 después del Silencio</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* ================================================================
+   ESTADO Y PERSISTENCIA
+================================================================ */
+const LS = {
+  key:'ae_api_key', sessions:'ae_sessions', chars:'ae_chars_v3', plot:'ae_plot', unlocked:'ae_dm_unlocked'
+};
+const DM_PASSWORD = 'aethelgard1332';
+
+/* Fichas PÚBLICAS: solo lo que cualquiera en Perster ve o sabe de los PJ.
+   La forastera aparece con su historia de tapadera, tal y como ella la cuenta. */
+const DEFAULT_CHARS = [
+  {name:'Jared de la Estirpe Aureus', clase:'Paladín', raza:'Humano', desc:'Hijo del General Aureus, el linaje más ilustre de Perster. Imponente, recto y cortés, criado entre los bancos de la iglesia y los campos de entrenamiento. Tras el altercado del mercado, le ha sido retirado el símbolo oficial, y el pueblo murmura: un Aureus bajo sospecha.', mot:'Demostrar que el honor de su apellido sigue intacto y proteger a la gente de Perster.'},
+  {name:'Guillermo de Baskerville', clase:'Clérigo erudito', raza:'Humano', desc:'Monje del Monasterio de la Santa Poda, entregado a la Iglesia de niño. Manos manchadas de tinta, mirada de quien lee más de lo que duerme. Conoce la anatomía, las hierbas y los pergaminos mejor que nadie en el pueblo, y hace demasiadas preguntas para gusto de sus superiores.', mot:'El conocimiento es la única luz que no proyecta sombras: entenderlo todo, aunque cueste.'},
+  {name:'Albion', clase:'Músico (Pícaro)', raza:'Dracónido', desc:'Músico de los callejones, de escamas pálidas que asoman bajo la ropa y oído imposible de engañar. Creció sin nombre y sin familia entre los tejados y los bajos de la taberna, donde su guitarra vale más que cualquier moneda. Aprendió el oficio —y alguna otra habilidad— de un viejo elfo que vive en un carromato.', mot:'Que su música suene en lugares donde a un Afligido ni siquiera le dejan entrar.'},
+  {name:'Kvothe', clase:'Alquimista (Pícaro)', raza:'Tiefling', desc:'Antiguo cómico de una compañía itinerante, hoy boticario de oficio impreciso en los límites del Gueto. Frío, metódico y de pocas bromas para haber sido del gremio del espectáculo. Sabe de ácidos, brebajes y cerraduras, y detecta una mentira en el sudor de quien la dice.', mot:'Cobrar lo que se le debe, saldar lo que debe, y que nadie vuelva a pillarle desprevenido.'},
+  {name:'La Forastera', clase:'Superviviente', raza:'Humana', desc:'Una joven campesina llegada esta misma noche, agotada y cubierta del polvo del camino. Cuenta que unos asaltantes quemaron la propiedad fronteriza donde vivía con sus padres, y que su padre, un ex-militar llamado Vinsmoke, le enseñó modales y disciplina. Carga una vieja lanza de la familia de la que no se separa... aunque ahora la custodia Jared.', mot:'Sobrevivir, encontrar un lugar seguro y recuperar lo único que le queda de su hogar.'}
+];
+
+const DEFAULT_SESSIONS = [
+  {num:1, title:'La Cosecha del Ojo', date:'', present:[0,1,2,3,4],
+   dm:'(Notas privadas del DM para la sesión 1.)',
+   pub:'Era el día de la Cosecha del Ojo, la gran festividad del otoño. Perster entero se volcó en la Plaza Mayor: música, comida comunitaria, el diezmo entregado a la Iglesia y un sermón que se hizo eterno. Entre el bullicio, nuestros caminos se cruzaron por primera vez. Antes de que terminara la jornada, ya estaba claro que aquel no iba a ser un festival como los demás.'},
+  {num:2, title:'Forasteros y rumores', date:'', present:[0,1,2,3,4],
+   dm:'(Notas privadas del DM para la sesión 2.)',
+   pub:'(Borrador — edítalo desde la sección DM.) Los rumores corrían por la taberna más rápido que la cerveza: se hablaba de una joven forastera llegada al pueblo, de movimientos extraños en torno al almacén de Korgath y de que la Tía Elga sabía más de lo que contaba. Decidimos meter las narices donde nadie nos llamaba.'},
+  {num:3, title:'Sombras tras el muro', date:'', present:[0,1,2,3,4],
+   dm:'(Notas privadas del DM para la sesión 3.)',
+   pub:'(Borrador — edítalo desde la sección DM.) Lo que descubrimos nos dejó más preguntas que respuestas. La Torre del Vigía hizo sonar la campana por primera vez en años, y comprendimos que los muros de Perster no nos protegen de todo lo que se mueve en la oscuridad. Algo ha empezado, y ya no hay vuelta atrás.'}
+];
+
+function load(k,d){ try{ const v = localStorage.getItem(k); return v? JSON.parse(v): d; }catch(e){ return d; } }
+function save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+
+let chars = load(LS.chars, DEFAULT_CHARS);
+let sessions = load(LS.sessions, DEFAULT_SESSIONS);
+
+/* ================================================================
+   NAVEGACIÓN
+================================================================ */
+function showView(which){
+  document.getElementById('nav-players').classList.toggle('active', which==='players');
+  document.getElementById('nav-dm').classList.toggle('active', which!=='players');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  if(which==='players'){
+    document.getElementById('view-players').classList.add('active');
+  } else {
+    if(sessionStorage.getItem(LS.unlocked)==='1'){
+      document.getElementById('view-dm').classList.add('active');
+    } else {
+      document.getElementById('view-dmgate').classList.add('active');
+      setTimeout(()=>document.getElementById('dm-pass').focus(),50);
+    }
+  }
+}
+/* La contraseña se exige en CADA carga de la página: el desbloqueo solo
+   dura mientras no se recargue ni se cierre la pestaña. */
+sessionStorage.removeItem(LS.unlocked);
+function tryUnlock(){
+  const v = document.getElementById('dm-pass').value;
+  if(v === DM_PASSWORD){
+    sessionStorage.setItem(LS.unlocked,'1');
+    document.getElementById('dm-pass').value='';
+    document.getElementById('gate-error').textContent='';
+    showView('dm');
+    // el DM ve en las pestañas públicas su estado local (vista previa sin publicar)
+    renderPublicDiary(); renderPublicChars();
+  } else {
+    document.getElementById('gate-error').textContent='El sello no cede. La palabra no es esa.';
+  }
+}
+/* tabs genéricas */
+document.querySelectorAll('.tabs').forEach(tabbar=>{
+  tabbar.addEventListener('click', e=>{
+    const btn = e.target.closest('button[data-tab]');
+    if(!btn) return;
+    tabbar.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById(btn.dataset.tab);
+    panel.parentElement.querySelectorAll(':scope > .tabpanel').forEach(p=>p.classList.remove('active'));
+    panel.classList.add('active');
+    if(btn.dataset.tab==='p-mapa') setTimeout(()=>{ map.invalidateSize(); },80);
+    if(btn.dataset.tab==='dm-map') setTimeout(()=>{ initWorldMap(); worldmap.invalidateSize(); },80);
+  });
+});
+
+/* ================================================================
+   MINI-MARKDOWN (para salidas de IA y diario)
+================================================================ */
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function md(t){
+  let h = esc(t.trim());
+  h = h.replace(/^### (.*)$/gm,'<h4>$1</h4>');
+  h = h.replace(/^## (.*)$/gm,'<h3>$1</h3>');
+  h = h.replace(/^# (.*)$/gm,'<h3>$1</h3>');
+  h = h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  h = h.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  h = h.replace(/^[-•] (.*)$/gm,'<li>$1</li>');
+  h = h.replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g,'<ul>$1</ul>');
+  h = h.split(/\n{2,}/).map(b=> /^<(h3|h4|ul)/.test(b.trim())? b : '<p>'+b.replace(/\n/g,'<br>')+'</p>').join('\n');
+  return h;
+}
+
+/* ================================================================
+   MAPA DE PERSTER (Leaflet, CRS Simple, imagen real Perster.png)
+   Coordenadas de los marcadores: x desde la izquierda, y desde
+   ARRIBA, en píxeles de la imagen original (787 x 807).
+================================================================ */
+const MAP_W=787, MAP_H=807;
+
+
+const PLACES = [
+  {name:'Plaza Mayor (Market District)', x:408, y:402, desc:'El corazón de Perster. Aquí se celebra el mercado semanal, se leen los edictos de la Iglesia y se reúne el pueblo en las festividades. La vieja fuente de piedra del centro lleva más años seca que húmeda, pero a nadie parece importarle.'},
+  {name:'Monasterio de la Santa Poda', x:455, y:505, desc:'Sede local de la Iglesia del Ojo de Lochom y el edificio más alto del pueblo, visible desde cualquier calle — como manda la doctrina. Los monjes administran los diezmos, los sermones, la morgue y la pequeña escuela. Sus puertas siempre están abiertas. Sus criptas, no.'},
+  {name:'Taberna «El Descanso del Peregrino»', x:475, y:345, desc:'Entre el Market District y Cotton Shade: cerveza aguada, estofado dudoso y los mejores rumores del Ducado. Si algo ocurre en Perster, antes de un día se comenta aquí en voz baja. El tabernero finge no escuchar nada y lo escucha absolutamente todo.'},
+  {name:'El Gueto (Black Borough)', x:350, y:610, desc:'El barrio del sur donde la Iglesia obliga a vivir a los llamados «Afligidos». Calles estrechas, casas apiñadas y miradas cansadas. Sus habitantes trabajan en los oficios que nadie más quiere y pagan diezmos que nadie más paga. Entre ellos hay más dignidad —y más secretos— de lo que el resto del pueblo imagina.'},
+  {name:'Torre del Vigía', x:225, y:255, desc:'La torre más alta del pueblo, asomada al bosque de Purple Well. Desde su almena se otean los campos y la línea gris donde empieza la Miasma. Allá arriba vive Bram, el campanero ciego, que dice conocer a cada vecino de Perster por el sonido de sus pasos, nadie ha visto nunca a Bram, y hace una semana que su campana suena de forma extraña.'},
+  {name:'La Cocina de la Tía Elga', x:370, y:635, desc:'Un edificio de piedra baja en el corazón del Gueto, con humo saliendo siempre de la chimenea. La Tía Elga alimenta a medio barrio, cura fiebres y echa a los guardias con su rodillo de amasar. La puerta nunca tiene llave, pero nadie entra con malas intenciones: el barrio no lo permitiría.'},
+  {name:'Almacén de Salazones de Korgath', x:290, y:575, desc:'El gran almacén del límite del Gueto, donde el olor a carne ahumada y sal lo impregna todo. Su dueño, Korgath «El Verde», es un orco enorme, de pocas palabras y cuentas exactas: prestamista, comerciante y la persona a la que medio Perster debe algo. Dicen que nunca olvida una cara... ni una moneda.'}
+];
+
+let map;
+function initMap(){
+  map = L.map('map', {crs:L.CRS.Simple, minZoom:-0.6, maxZoom:1.6, zoomSnap:.2, attributionControl:false});
+  const bounds = [[0,0],[MAP_H,MAP_W]];
+  L.imageOverlay('Perster.png', bounds).addTo(map);
+  map.fitBounds(bounds);
+  map.setMaxBounds([[-80,-120],[MAP_H+80,MAP_W+120]]);
+  const legend = document.getElementById('map-legend');
+  PLACES.forEach(p=>{
+    const ll = [MAP_H - p.y, p.x];
+    const m = L.marker(ll, {icon: L.divIcon({className:'map-marker', iconSize:[18,18], iconAnchor:[9,9], popupAnchor:[0,-12]})}).addTo(map);
+    m.bindPopup(`<h3>${p.name}</h3>${p.desc}`, {maxWidth:300});
+    const b = document.createElement('button');
+    b.textContent = '◈ '+p.name;
+    b.onclick = ()=>{ map.setView(ll, 0.8); m.openPopup(); };
+    legend.appendChild(b);
+  });
+}
+
+/* ================================================================
+   MAPA DEL MUNDO (solo DM) — Aethelgard.png, 797 x 477
+================================================================ */
+let worldmap = null;
+function initWorldMap(){
+  if(worldmap) return;
+  const W=797, H=477;
+  worldmap = L.map('worldmap', {crs:L.CRS.Simple, minZoom:-0.4, maxZoom:2, zoomSnap:.2, attributionControl:false});
+  const b = [[0,0],[H,W]];
+  L.imageOverlay('Aethelgard.png', b).addTo(worldmap);
+  worldmap.fitBounds(b);
+  worldmap.setMaxBounds([[-60,-90],[H+60,W+90]]);
+}
+
+/* ================================================================
+   CONTENIDO PÚBLICO: DIARIO Y FICHAS
+   En la web publicada, los jugadores leen data/public.json (subido
+   con el botón «Publicar»). El DM desbloqueado ve una vista previa
+   de su estado local, todavía sin publicar.
+================================================================ */
+let publicData = null; // {updated, chars:[], diary:[]}
+function dmUnlocked(){ return sessionStorage.getItem(LS.unlocked)==='1'; }
+async function loadPublicData(){
+  const gh = getGhConfig();
+  const urls = [];
+  if(gh.owner && gh.repo) urls.push(`https://raw.githubusercontent.com/${gh.owner}/${gh.repo}/${gh.branch||'main'}/data/public.json?t=${Date.now()}`);
+  urls.push('data/public.json?t='+Date.now());
+  for(const u of urls){
+    try{
+      const r = await fetch(u, {cache:'no-store'});
+      if(r.ok){ publicData = await r.json(); break; }
+    }catch(e){ /* sin red o archivo inexistente: usamos datos locales */ }
+  }
+  renderPublicDiary();
+  renderPublicChars();
+}
+function localDiary(){
+  return sessions.filter(s=>s.pub && s.pub.trim()).map(s=>({num:s.num, title:s.title, date:s.date, pub:s.pub}));
+}
+function renderPublicDiary(){
+  const el = document.getElementById('public-diary');
+  const entries = (publicData && !dmUnlocked())? (publicData.diary||[]) : localDiary();
+  if(!entries.length){ el.innerHTML = '<div class="parchment"><p style="text-align:center;font-style:italic">El diario aún está en blanco.</p></div>'; return; }
+  el.innerHTML = entries.map(s=>`
+    <div class="parchment deco-corner diary-entry">
+      <div class="session-meta">SESIÓN ${s.num}${s.date? ' · '+esc(s.date):''}</div>
+      <h3>${esc(s.title||'Sin título')}</h3>
+      ${md(s.pub)}
+    </div>`).join('');
+}
+function renderPublicChars(){
+  const el = document.getElementById('public-chars');
+  const list = (publicData && !dmUnlocked())? (publicData.chars||[]) : chars;
+  el.innerHTML = list.map(c=>`
+    <div class="parchment char-card deco-corner">
+      <h3>${esc(c.name)}</h3>
+      <div class="char-meta">${esc(c.raza)} · ${esc(c.clase)}</div>
+      <span class="label">DESCRIPCIÓN</span><p>${esc(c.desc)}</p>
+      <span class="label">MOTIVACIÓN</span><p><em>${esc(c.mot)}</em></p>
+    </div>`).join('');
+}
+
+/* ================================================================
+   LORE DEL DM
+================================================================ */
+const LORE = {
+ 'Historia':[
+  {t:'I · El Mundo Antes de la Mentira', s:'Hace 600+ años', b:`Aethelgard era un mundo libre: caminos abiertos, reinos conectados, y la palabra «Afligido» no existía. Solo había <strong>dos razas</strong>: humanos y elfos. Ningún tiefling, dracónido ni orco — aún no existían.
+<p>Dos potencias dividían el continente: el <strong>Imperio de Valdris</strong> al oeste y el <strong>Imperio de Sorreth</strong> al este, en un equilibrio tenso pero funcional. Ese mundo terminó en un solo año. No fue una guerra: fue una trampa, tendida por un hombre que creía que el orden valía más que la libertad.</p>`},
+  {t:'II · El Imperio de Valdris', s:'Luz, piedra blanca y mar', b:`Ciudades sobre colinas mirando al océano, casas encaladas, tejados planos (la actual Ymalean da una idea de cómo era). Confederación bajo <strong>monarquía matriarcal</strong>: la máxima autoridad era la <strong>Kýria</strong> (reina-comandante), con herencia por línea materna.
+<p>Las <strong>Forjadoras del Eco</strong>: las mejores herreras del mundo, capaces de imbuir armas con propiedades permanentes mediante metales raros, rituales de templa y su propia sangre. Armas con nombre propio: <em>La Espina de Mireth, El Filo que No Descansa, La Hoja del Alba.</em></p>
+<p>La última Kýria fue <strong>Aldris II</strong>, que murió sin heredera directa — la crisis de sucesión que Malachar aprovechó.</p>`},
+  {t:'II · El Imperio de Sorreth', s:'Mármol, orden, frío', b:`Ciudades en cuadrícula, fachadas idénticas, edictos del Estado en cada plaza. Su capital, <strong>Sorrath Magna</strong>, fue la mayor ciudad del mundo: sus cimientos siguen enterrados bajo el corazón del actual Imperio Bramber sin que nadie lo sepa.
+<p>Su rey: <strong>Malachar Sorreth III</strong>, «El Eterno» antes del pacto, «El Devorado» después. Administrador brillante y estratega frío que vio en la magia demoníaca una <em>herramienta de gobierno</em>. No odiaba a Valdris: simplemente, un solo imperio era más ordenado que dos.</p>`},
+  {t:'III · La Gran Guerra Santa', s:'La caída de Valdris', b:`Empezó con una ausencia: la muerte de la Kýria Aldris II dejó a Valdris en tres años de disputa sucesoria. Malachar esperó, y entonces cruzó la frontera.
+<p>Dos años de guerra convencional donde Valdris aguantó (sus Forjadoras y su caballería eran superiores). Entonces llegó <strong>«el año en que el cielo se oscureció»</strong>: siete noches sin luna ni estrellas sobre Sorrath Magna. Al octavo día los ejércitos de Sorreth avanzaron y nadie pudo detenerlos.</p>
+<p>Valdris cayó en menos de un año. La Kýria murió en la <strong>Batalla de los Campos de Valdenmoor</strong>, el último gran combate en campo abierto. Lo que siguió no fue guerra: fue persecución.</p>`},
+  {t:'IV · El Pacto de las Seis Sombras', s:'El origen de todo', b:`Malachar convocó a <strong>seis entidades del plano inferior</strong>. Cada demonio entregó un objeto de poder a cambio de una <strong>deuda renovable</strong>: mientras la Miasma siga activa, los demonios reciben un flujo continuo de sufrimiento y sangre. Los seis objetos son las claves del contrato: <strong>reunirlos activa la «Consumación»</strong>, el ritual que invocaría físicamente a los seis demonios al plano material.
+<p>Abrir la fisura durante siete noches adelgazó la frontera entre planos en todo el continente: entraron también dragones, orcos y una contaminación demoníaca que alteró la línea genética de miles de humanos. El mundo nunca volvió a ser solo de humanos y elfos.</p>
+<p>Malachar murió tres años después de la conquista <em>sin completar la Consumación</em>. Dejó un continente sometido, seis objetos dispersos, razas nuevas y la semilla de la Iglesia del Ojo de Lochom.</p>`},
+  {t:'V · La Fragmentación: los Cinco Reinos', s:'La mentira oficial', b:`Sin Malachar, Sorreth se fracturó en una generación: sus <strong>cinco hijos</strong> se repartieron el territorio, dando origen a los cinco reinos actuales.
+<p><strong>La versión de la Iglesia:</strong> hace ~600 años una catástrofe misteriosa abrió un portal que trajo criaturas y una niebla mortal; los cinco reinos se unieron heroicamente; Ymalean se mantuvo cobardemente al margen. <em>La única parte verdadera es que Ymalean no participó. Todo lo demás es una inversión completa de los hechos.</em></p>
+<p><strong>El monopolio:</strong> la Iglesia controla toda la información, todo el comercio exterior y el suministro de sal. Nadie sale de los pueblos; todo llega en los carros de la Iglesia. Un pueblo rebelde simplemente deja de recibir suministros. No necesitas ejércitos si controlas la cadena de suministro.</p>`},
+  {t:'XIII · El Estado del Mundo en 1332', s:'666 años después del pacto', b:`El Papa actual, <strong>Pontífice Supremo Caron Vel Ashe</strong>, lleva 30 años en el cargo y ha localizado la mayor parte de los seis objetos. Setenta años, voz suave, modales impecables, fe completamente nula: la religión es su herramienta de control continental.
+<p>Gobierna desde <strong>La Sede del Ojo</strong> en Ilmzois (Gobgar). La <strong>séptima torre</strong> de su palacio está sellada y contiene el altar del pacto original restaurado. Su objetivo para 1332: reunir los seis objetos y completar la <strong>Consumación</strong>.</p>
+<p>Solo hay un problema: uno de los objetos está en manos de una chica que acaba de aparecer en un pueblo llamado <strong>Perster</strong>. Y en ese mismo pueblo hay un grupo de personas que, sin saberlo, son los únicos capaces de romper la gran mentira de Aethelgard.</p>`},
+  {t:'XIV · Fallos en la Verdad Oficial', s:'Hilos de los que tirar', b:`<ul>
+<li><strong>¿Por qué la Miasma no cubre el mar?</strong> Es un ritual terrestre con puntos de anclaje en tierra firme. Ymalean y sus plantas prueban que puede contrarrestarse.</li>
+<li><strong>¿De dónde vienen los Afligidos?</strong> Los registros más antiguos describen un mundo solo de humanos y elfos. Alguien los creó: no fue ningún portal misterioso.</li>
+<li><strong>¿Por qué la Iglesia sigue necesitando sangre tras 666 años?</strong> El pacto es un contrato de suministro continuo. Detener las cosechas apagaría la Miasma... y alertaría a los demonios de que el contrato se ha roto.</li>
+<li><strong>¿Por qué el Códice de Elian está en «Infernal»?</strong> Porque está en el idioma común antiguo, que la Iglesia rebautizó para criminalizar todo texto anterior a la conquista.</li>
+<li><strong>¿Por qué los reyes no se rebelan?</strong> Cada rey tiene un confesor-espía de la Inquisición, y la Iglesia controla la sal. Control económico y psicológico, no militar.</li>
+<li><strong>¿Sirve la Lanza purificada para la Consumación?</strong> El Papa cree que sí; las Forjadoras creían que no. Sin respuesta hasta que los jugadores la encuentren.</li></ul>`}
+ ],
+ 'Reinos':[
+  {t:'Gran Ducado de Bertonsia', s:'La cuna de la historia · Inglaterra medieval', b:`<strong>Gobernante:</strong> Duque Aldric Veyne III · <strong>Capital:</strong> Veynhold. <em>Aquí está Perster.</em>
+<p>Tierras bajas y pantanosas al sur, colinas boscosas al norte, clima perpetuamente nublado. Piedra oscura, calles estrechas, templos siempre como edificio más alto. Sociedad muy estratificada; campesinado resignado y supersticioso. La mayor presencia eclesiástica de todos los reinos: un clérigo por cada 200 habitantes.</p>
+<p><strong>El Duque:</strong> refinado y profundamente cobarde. Delega todo en consejeros aprobados por la Iglesia. Sabe que las purificaciones existen y mira a otro lado. Su mayor miedo no es la Miasma: es perder su posición.</p>
+<p><strong>Festividades:</strong> <em>La Cosecha del Ojo</em> (otoño; el diezmo anual disfrazado de ofrenda — los jugadores la vivieron en la sesión 1) · <em>El Día del Muro</em> (primavera; los niños pintan los muros con cal, los adultos renuevan votos de no cruzarlos — refuerzo anual del miedo) · <em>La Noche de las Velas</em> (invierno; una vela en cada ventana; genuinamente hermosa y genuinamente triste).</p>`},
+  {t:'Imperio Bramber', s:'El coloso dormido · Roma tardía / otomano', b:`<strong>Gobernante:</strong> Emperador Caius Dorn · <strong>Capital:</strong> Bramberoth.
+<p>El reino más extenso, construido literalmente sobre los cimientos de Sorrath Magna: acueductos funcionales, calzadas, edificios monumentales. Único reino que celebra la herencia sorretiana sin saber qué celebra. Clase militar poderosa e independiente en tensión crónica con la nobleza civil; la Iglesia arbitra entre ambas, lo que le da una palanca enorme.</p>
+<p><strong>El Emperador:</strong> 60 años, veterano, pelo blanco, habla poco y decide con precisión absoluta. La <strong>Balanza de Stratos</strong> bajo su dormitorio lleva décadas filtrando su influencia: no tiene amigos, tiene activos y pasivos. En el fondo sabe que algo está mal en él.</p>
+<p><strong>Festividades:</strong> <em>El Desfile de las Legiones</em> (verano; la más laica, irrita al Papa) · <em>La Semana del Cimiento</em> (invierno; ayuno, edictos y burocracia en honor a Stratos) · <em>El Banquete de los Muertos</em> (otoño; platos para los difuntos; raíz valdriana que la Iglesia absorbió como homenaje a Kull).</p>`},
+  {t:'Reino de Baresdonia', s:'El norte duro · Escandinavia oscura', b:`<strong>Gobernante:</strong> Rey Edran Thal · <strong>Capital:</strong> Thalvik.
+<p>Inviernos brutales, bosques densos, construcciones bajas de madera y piedra. Templos pequeños («tibieza religiosa» para la Iglesia). El campesinado cree en espíritus del bosque, presagios en entrañas y árboles que guardan memorias: la Iglesia llama a esto «ecos de la oscuridad» y nunca ha podido erradicarlo.</p>
+<p><strong>El Rey:</strong> 19 años; heredó tras la muerte repentina de su padre (probablemente envenenado por la Inquisición). Físicamente imponente, interiormente paralizado: el <strong>Espejo de las Siete Caras</strong>, ante el que ha crecido, lo ha convertido en su peor enemigo. El gobernante más inseguro y manipulable.</p>
+<p><strong>Festividades:</strong> <em>La Cacería del Alba</em> (primavera; caza junto al muro; el ganador es «Rey del Alba» una semana) · <em>La Noche de los Nombres</em> (invierno; nombres de los muertos grabados en tablillas que se queman al alba) · <em>El Juicio de Hierro</em> (verano; disputas resueltas por combate; la Iglesia lo detesta pero no puede prohibirlo).</p>`},
+  {t:'Tearquía de Gobgar', s:'El corazón de la fe · Bizancio teocrático', b:`<strong>Gobernantes:</strong> Los Cuatro Tearcas · <strong>Capital:</strong> Ilmzois (sede del Papa; la ciudad más grande, hermosa y vigilada de Aethelgard).
+<p>Mosaicos dorados, incienso permanente, procesiones tres veces al día. Sin separación entre clase religiosa y gobernante: los Tearcas rotan el poder cada 7 años. Población genuinamente devota: fe e identidad indistinguibles.</p>
+<p><strong>Los Tearcas:</strong> <em>Maren</em> (72; sospecha la corrupción de la cúpula, se cree demasiado vieja para actuar) · <em>Dovin</em> (40; quiere ser el próximo Papa a cualquier precio) · <em>Sael</em> (35; devota sincera e ignorante — la más peligrosa porque cree de verdad) · <em>Brenn</em> (50; pragmático: sabe que algo no encaja y ha calculado que no le conviene confirmarlo).</p>
+<p><strong>Festividades:</strong> <em>La Procesión del Ojo</em> (cada luna llena; obligatoria; hermosa y opresiva a la vez) · <em>Los Siete Días del Silencio</em> (invierno; prohibido hablar en las calles; la semana de más arrestos de la Inquisición) · <em>El Año Nuevo del Ojo</em> (3 días de banquete y anuncio de los «milagros del año»: las purificaciones presentadas como intervención divina).</p>`},
+  {t:'Principado de Ilm', s:'El reino pequeño · Principado dependiente', b:`<strong>Gobernante:</strong> Princesa Regent Sova Mirn · <strong>Capital:</strong> Mirenhall (~40.000 hab., famosa por sus jardines interiores).
+<p>El reino más pequeño, agrícola y modesto, más igualitario por necesidad. El <strong>Cayado de Mornac</strong> (expuesto en el Museo de Reliquias de Mirenhall) ha generado una población extraordinariamente dócil que ni siquiera se pregunta por qué lo es.</p>
+<p><strong>La Regente:</strong> 40 años, inteligente y cautelosa. Gobierna por su hijo de 8 años desde que su marido murió en una «expedición de limpieza» hace 4 años; tiene la certeza silenciosa de que fue la Iglesia. Nunca dice exactamente lo que piensa. Lleva 4 años construyendo una red de información propia que la Iglesia aún no ha detectado.</p>
+<p><strong>Festividades:</strong> <em>El Día del Enraizamiento</em> (primavera; plantado colectivo en jardines comunitarios) · <em>La Vigilia del Príncipe</em> (cumpleaños del heredero; Sova construye lealtad personal al niño) · <em>El Silencio de los Jardines</em> (invierno; todas las luces apagadas, luto colectivo reinterpretado).</p>`},
+  {t:'Ducado de Ymalean', s:'El vestigio de Valdris · Cícladas matriarcales', b:`<strong>Gobernante:</strong> Kýria Thessara · isla pequeña al oeste del continente.
+<p>Casas encaladas, calles empedradas, flores en las ventanas: el único lugar donde sobrevive algo del mundo anterior — la arquitectura de Valdris, la tradición matriarcal, las <strong>Forjadoras del Eco</strong> y el recuerdo fragmentado de lo que ocurrió.</p>
+<p>Cuando Valdris cayó, supervivientes huyeron al mar con la <strong>Lanza de Ghorum</strong>. Las Forjadoras realizaron un ritual con las raíces de una planta endémica que formó una <strong>barrera natural que repele la Miasma</strong>; costó la vida de varias Forjadoras, recordadas cada año en el Enraizamiento. Los isleños lo viven como bendición ancestral y creen que el mar está rodeado de Miasma. <em>En realidad el mar abierto está limpio, pero nadie lo comprueba.</em></p>
+<p><strong>La culpa colectiva:</strong> cargan con la culpa de «no haber ayudado»; desde fuera los llaman herejes cobardes. Ironía perfecta: los descendientes de los únicos que resistieron a Sorreth son los traidores de la historia oficial.</p>
+<p><strong>La Canción de las Siete Estrellas:</strong> canción de cuna («La Noche de las Siete Estrellas Apagadas») que narra la oscuridad del este, seis regalos envenenados y una reina que huyó al mar. Es la historia real preservada como melodía infantil. <em>Nota DM: la Princesa la conoce de memoria y la tarareará en algún momento; Guillermo reconocerá palabras del idioma antiguo. Es el momento en que los jugadores conectarán Ymalean con la verdad.</em></p>
+<p><strong>La Kýria Thessara:</strong> madre de la Princesa, ~40 años, diplomática y guerrera. Lleva semanas sin noticias de su hija tras el ataque de la Inquisición. Prepara una respuesta pero no puede actuar abiertamente sin desencadenar una guerra que Ymalean no puede ganar sola.</p>
+<p><strong>Festividades:</strong> <em>El Enraizamiento</em> (primavera; la más sagrada) · <em>La Noche del Regreso</em> (otoño; hogueras en la costa mirando al continente; luto que nadie recuerda como tal) · <em>El Torneo de las Forjadoras</em> (verano; las aprendizas presentan su primera arma imbuida ante la Kýria).</p>`}
+ ],
+ 'Personajes':[
+  {t:'Malachar Sorreth III', s:'«El Eterno» / «El Devorado»', b:`Rey de Sorreth, autor del Pacto de las Seis Sombras. Administrador brillante, estratega frío; vio la magia demoníaca como herramienta de gobierno, no como corrupción. Convocó a los seis demonios, conquistó Valdris y murió tres años después sin completar la Consumación. Acumuló los textos del pacto en secreto desde su juventud.`},
+  {t:'Kýria Aldris II', s:'Última Kýria de Valdris', b:`Mujer justa que murió sin heredera directa, desencadenando la crisis de sucesión de tres años que Malachar aprovechó. La Kýria que la sucedió en la regencia murió en la Batalla de los Campos de Valdenmoor.`},
+  {t:'Papa Caron Vel Ashe', s:'Pontífice Supremo · el villano central', b:`70 años, 30 en el cargo. Voz suave, modales impecables: no grita, no amenaza, nunca se mancha las manos. Fe completamente nula — la religión es su herramienta de control continental.
+<p>Porta (fundido a su piel) el <strong>Anillo de la Brasa Viva de Vultun</strong>: puede ver a través de los ojos de cualquiera que haya mirado el símbolo del Ojo en los últimos 7 días. Por eso lleva siempre guantes de cuero negro. Prácticamente todos los ciudadanos son sus espías involuntarios.</p>
+<p>Gobierna desde La Sede del Ojo (Ilmzois). Su séptima torre, sellada, contiene el altar del pacto restaurado. Objetivo en 1332: reunir los seis objetos y completar la Consumación.</p>`},
+  {t:'Elian el Narrador', s:'El testigo de 600 años', b:`Hace 600 años vivía en Perster; su hija enfermó, la Iglesia no tenía respuestas, y salió. Documentó el mundo real tras la guerra en su diario — el <strong>Códice de Elian</strong> — escrito en el idioma común antiguo (hoy «Infernal»). Describe Valdenmoor, las ruinas humeantes de Sorrath Magna, los primeros tieflings, la Miasma sobre las cosechas y el Perster de los muros nuevos.
+<p>Murió de la Miasma: su <strong>alma</strong> quedó atrapada en el Sudario de Kull; su <strong>cuerpo</strong> es un Ghoul que lleva 600 años en las cuevas bajo el Gran Santuario de Shiford, gravitando hacia el fragmento principal del Sudario cosido al altar mayor.</p>
+<p><strong>El Encuentro:</strong> reuniendo los 3 fragmentos del Sudario y con el ritual correcto, puede devolverse temporalmente su alma al cuerpo: minutos, quizá una hora, con el único testigo directo del mundo anterior. Después, decisión: devolverlo al Sudario, dejarlo como Ghoul, o liberarlo destruyendo el cuerpo. <em>Elian pedirá la liberación: lleva 600 años sufriendo. Nota DM: programar en el arco medio, cuando hayan descifrado bastante Códice.</em></p>`},
+  {t:'Duque Aldric Veyne III', s:'Bertonsia · el cobarde refinado', b:`Aristócrata de mediana edad. Gobierna Veynhold delegando en consejeros aprobados por la Iglesia. Sabe de las purificaciones y mira a otro lado. Solo teme perder su posición — y un hombre que solo teme caer nunca se atreve a levantarse.`},
+  {t:'Emperador Caius Dorn', s:'Bramber · el calculador', b:`60 años, veterano imponente de pelo blanco. La Balanza de Stratos bajo su dormitorio lo ha convertido en el gobernante más fríamente calculador de los cinco reinos: activos y pasivos, no amigos. En el fondo de lo que le queda de humanidad sabe que algo está mal en él.`},
+  {t:'Rey Edran Thal', s:'Baresdonia · el rey roto', b:`19 años. Padre probablemente envenenado por la Inquisición. Parece un rey nórdico, pero el Espejo de las Siete Caras —ante el que ha pasado cada día de su vida— lo paraliza ante cualquier decisión. El más inseguro y manipulable de los gobernantes.`},
+  {t:'Los Cuatro Tearcas', s:'Gobgar · poder rotatorio', b:`<ul><li><strong>Maren</strong> (72): sospecha la corrupción de la cúpula; demasiado vieja para actuar, o eso ha decidido.</li><li><strong>Dovin</strong> (40): ambicioso; quiere ser el próximo Papa y haría cualquier cosa.</li><li><strong>Sael</strong> (35): devota sincera e ignorante de la verdad; la más peligrosa porque cree.</li><li><strong>Brenn</strong> (50): pragmático; sabe que algo no encaja y prefiere no confirmarlo.</li></ul>`},
+  {t:'Princesa Regent Sova Mirn', s:'Ilm · la viuda paciente', b:`40 años. Gobierna por su hijo de 8 desde la muerte de su marido en una «expedición de limpieza» (la Iglesia, casi con certeza). Nunca dice lo que piensa. Cuatro años tejiendo una red de información propia, aún sin detectar. Ha notado que los guardias de la sala del Cayado son siempre los más dóciles.`},
+  {t:'Kýria Thessara', s:'Ymalean · la madre', b:`Madre de la Princesa, ~40 años, formada en diplomacia y combate. Sin noticias de su hija desde el ataque de la Inquisición. Prepara una respuesta, pero actuar abiertamente significaría una guerra que Ymalean no puede ganar sola. Gobierna sabiendo que su pueblo es el último vestigio de algo que el mundo intentó borrar.`},
+  {t:'Los Seis Demonios del Pacto', s:'Dioses oficiales · máscaras eclesiásticas', b:`<ul>
+<li><strong>Ghorum «El Sembrador»</strong> — dios de la cosecha · demonio de la conquista ilimitada · otorgó la Lanza.</li>
+<li><strong>Kull «El Segador de Almas»</strong> — dios del descanso eterno · demonio de la cosecha de almas como combustible · otorgó el Sudario.</li>
+<li><strong>Vultun «El Vigilante»</strong> — dios de la protección · demonio del control omnisciente · otorgó el Anillo de la Brasa Viva.</li>
+<li><strong>Stratos «El Cimiento»</strong> — dios del orden · demonio de la jerarquía absoluta · otorgó la Balanza.</li>
+<li><strong>Ixor «El Pastor»</strong> — dios de la guía espiritual · demonio del sometimiento · otorgó el Espejo de las Siete Caras.</li>
+<li><strong>Mornac «El Rostro del Silencio»</strong> — dios de la humildad · demonio de la censura y el borrado de memoria · otorgó el Cayado del Pastor.</li></ul>`}
+ ],
+ 'Objetos':[
+  {t:'La Lanza Purificada de Ghorum', s:'Ymalean · en manos de la Princesa', b:`El objeto más ofensivo del pacto en manos del pueblo más pacífico. Arrebatada en Valdenmoor; 600 años purificada capa a capa por las Forjadoras. Nunca limpiada del todo: en su núcleo vibra algo antiguo que la Princesa siente sin entender.
+<p><strong>Efectos:</strong> nunca falla un golpe destinado a proteger a otro; usada por conquista o ambición, tiembla y provoca náuseas. Cerca de los otros cinco objetos, el filo se oscurece y emite un zumbido que solo su portadora oye.</p>`},
+  {t:'El Sudario de Kull', s:'Bertonsia · Gran Santuario de Shiford', b:`Tela que cubrió el mayor campo de batalla de la guerra y absorbió las almas de los muertos que tocó. Su pieza principal lleva 400 años cosida por dentro a los ornamentos del altar del Gran Santuario de Shiford; <strong>dos fragmentos menores</strong> son manteles de familias nobles de la ciudad que no saben lo que tienen. Todas las almas muertas por la Miasma en 600 años —incluida la de Elian— están atrapadas en su tejido.
+<p><strong>Efectos:</strong> quien muera sobre él no puede ser resucitado; la tela siempre está a temperatura corporal. Reuniendo los tres fragmentos puede devolverse temporalmente un alma atrapada a su cuerpo.</p>`},
+  {t:'El Anillo de la Brasa Viva de Vultun', s:'Gobgar · fundido al dedo del Papa', b:`Hierro negro con una llama sin combustible que nunca se apaga. Malachar veía a través de los ojos de quien lo mirase. Tras siglos migrando hacia arriba en la jerarquía, encontró al entonces Cardenal Caron Vel Ashe y se fundió con su piel la primera noche. Por eso el Papa lleva siempre guantes negros.
+<p><strong>Efectos:</strong> el Papa ve a través de los ojos de cualquiera que haya mirado el símbolo del Ojo de Lochom en los últimos 7 días — es decir, de casi todo el continente.</p>`},
+  {t:'La Balanza de Stratos', s:'Bramber · cripta del palacio imperial', b:`No mide peso: mide <em>valor humano para el orden establecido</em>. Enterrada con el último general sorretiano bajo el palacio de Bramberoth. El Emperador Caius Dorn duerme sobre ella cada noche; décadas de influencia filtrándose por la piedra.
+<p><strong>Efectos:</strong> el portador ve el «valor jerárquico» de cada persona. Cada semana de uso: tirada de Sabiduría o pérdida permanente de 1 punto de Carisma.</p>`},
+  {t:'El Espejo de las Siete Caras de Ixor', s:'Baresdonia · galería del palacio real', b:`No refleja lo que tienes delante: refleja <em>lo que más temes ser</em>. Herramienta de rendición psicológica de Malachar. Cuelga como trofeo en la galería de retratos del palacio de Thalvik; el rey Edran Thal ha crecido pasando frente a él cada día.
+<p><strong>Efectos:</strong> mirarlo más de un asalto: Sabiduría CD 14 o quedar aterrado de uno mismo 1 hora; fallo por 5+: paralización 1 minuto.</p>`},
+  {t:'El Cayado del Pastor de Mornac', s:'Ilm · Museo de Reliquias de Mirenhall', b:`Usado en la conquista para la conversión masiva: un golpe en el suelo y una ciudad entera perdía el instinto de resistencia. Hoy está en una vitrina etiquetado como «bastón pastoral de origen antiguo». Sova Mirn ha notado que los guardias de esa sala son siempre los más dóciles.
+<p><strong>Efectos:</strong> 50 m de radio con desventaja para resistir órdenes de autoridad. Golpear el suelo: Sabiduría CD 16 o Sugestión 1 hora.</p>`},
+  {t:'El Códice de Elian', s:'El diario del testigo', b:`No es un grimorio demoníaco: es la crónica de un hombre que vio el mundo real y lo anotó sabiendo que nadie le creería. Escrito en el idioma común antiguo («Infernal» para la Iglesia). Describe Valdenmoor, Sorrath Magna en ruinas, los primeros tieflings, la Miasma sobre las cosechas y el Perster de posguerra. <em>Guillermo está descifrándolo.</em>`},
+  {t:'Las Tablillas de Traducción', s:'Diccionarios prohibidos', b:`No son herramientas arcanas: son diccionarios del idioma de los abuelos de los abuelos, perseguidos con la misma ferocidad que los textos que ayudan a leer. <strong>Encontrar una tablilla es encontrar un crimen.</strong> Los jugadores irán encontrándolas para descifrar el Códice.`}
+ ],
+ 'Razas':[
+  {t:'Tieflings', s:'Las víctimas convertidas en combustible', b:`Miles de humanos cercanos a los puntos de anclaje del ritual absorbieron esencia demoníaca durante las siete noches. No los transformó a ellos: alteró su línea genética. Sus hijos nacieron con cuernos, colas y pieles imposibles — físicamente distintos, en todo lo demás humanos.
+<p>La Iglesia los persigue y <strong>cosecha su sangre para mantener activa la Miasma</strong>: la institución que los creó los usa como combustible para perpetuarse. El ciclo más cruel de la historia de Aethelgard.</p>`},
+  {t:'Dracónidos', s:'«Cómplices voluntarios de la oscuridad»', b:`Las fisuras también dejaron pasar dragones, cuya esencia contaminó la línea genética de los humanos en contacto con ellos. La Iglesia los considera cómplices voluntarios, a diferencia de los tieflings («víctimas impuras»).`},
+  {t:'Orcos', s:'Una raza propia, no una mezcla', b:`No son mezcla con humanos: son una raza del plano inferior que el pacto arrastró al plano material. Conservan una <strong>memoria oral propia sobre su mundo de origen</strong> que ninguna otra raza «Afligida» posee.`},
+  {t:'Los Elfos', s:'La biblioteca perseguida', b:`La otra raza original. Los primeros en entender lo ocurrido y los primeros en ser perseguidos sistemáticamente. Quedan muy pocos, en dos grupos:
+<p><strong>El Asentamiento:</strong> lugar sin nombre en ningún mapa, oculto donde la Miasma no llega. Cultivan, preservan el idioma antiguo y guardan la historia real. No salen jamás: exponerse sería la extinción. Son la biblioteca más importante de Aethelgard.</p>
+<p><strong>Los elfos de ciudad:</strong> renunciaron al Asentamiento, aprendieron a callar y sobreviven mezclados. <em>Nota DM: el elfo del carromato que enseñó a Albion (guitarra y ganzúas) es de este grupo. Bien presionado, podría ser el primer hilo hacia el Asentamiento.</em></p>`},
+  {t:'Los Ghouls', s:'El destino de los que salen', b:`La Miasma es lenta y acumulativa: fatiga y desorientación, palidez progresiva, pérdida de apetito, embotamiento... y muerte. <em>Pero no del todo.</em>
+<p>Queda un <strong>Ghoul</strong>: carcasa sin consciencia, pálida como la cera, uñas largas, ojos blancos. No recuerda nada. Busca nutrientes por instinto, el sol lo destruye, vive en cuevas y túneles, solo se mueve de noche. Puede sobrevivir 200-300 años o más.</p>
+<p>Las almas de los muertos por la Miasma <strong>no se liberan</strong>: quedan atrapadas en el Sudario de Kull. El cuerpo vaga sin consciencia; el alma espera en el tejido.</p>`}
+ ],
+ 'Iglesia y Misterios':[
+  {t:'La Iglesia del Ojo de Lochom', s:'El aparato de la mentira', b:`Fundada sobre la semilla que dejó Malachar. Sus seis «dioses» son los seis demonios del pacto con máscaras eclesiásticas. Controla la información, el comercio exterior y el suministro de <strong>sal</strong>; sus carros son el único contacto de los pueblos con el exterior. Un pueblo rebelde deja de recibir suministros.
+<p>Cada rey tiene un <strong>confesor personal que es agente de la Inquisición</strong>. Las «purificaciones» (cosechas de sangre de tieflings para alimentar la Miasma) se presentan como milagros. Doctrina oficial: <em>«El Ojo está abierto, y en Su mirada, hay Paz.»</em></p>`},
+  {t:'La Miasma', s:'El ritual que envenena el mundo', b:`No es un fenómeno natural: es un <strong>ritual terrestre activo</strong> con puntos de anclaje en tierra firme, mantenido con sangre cosechada (especialmente de tieflings). El mar abierto está limpio. Las plantas de Ymalean prueban que puede contrarrestarse. Detener las cosechas la apagaría... y alertaría a los demonios de que el contrato se ha roto.`},
+  {t:'El Idioma Antiguo', s:'Rebautizado «Infernal»', b:`Antes de la conquista había un solo idioma común, hablado por Valdris, Sorreth, mercaderes y bardos. La Iglesia impuso uno nuevo y rebautizó el antiguo como «Infernal», asociándolo a la demonología: cualquier texto antiguo se convierte automáticamente en crimen de fe por el idioma en que está escrito.
+<p>Los elfos del Asentamiento lo hablan como lengua materna; algunos elfos longevos de las ciudades lo recuerdan con fluidez — eso los convierte en los seres más peligrosos del mundo para la Iglesia.</p>`},
+  {t:'La Consumación', s:'El plan del Papa para 1332', b:`Reunir los seis objetos activa la Consumación: la invocación física de los seis demonios al plano material y la entrega total de la voluntad de la población. El Papa ha localizado la mayoría de los objetos. La Lanza, en manos de la Princesa en Perster, es la pieza que le falta. <em>¿Sirve la Lanza purificada? El Papa cree que sí; las Forjadoras creían que no.</em>`},
+  {t:'El Asentamiento', s:'El refugio élfico sin nombre', b:`Oculto donde la Miasma no llega, fuera de todos los mapas. Sus elfos preservan el idioma antiguo y la historia real: la biblioteca viva de Aethelgard. Posible vía de acceso para los jugadores: el viejo elfo del carromato de Albion.`}
+ ],
+ 'PNJs de Perster':[
+  {t:'Padre Valerius', s:'Monasterio de la Santa Poda · la máxima autoridad del pueblo', b:`<em>«El Ojo está abierto, y en Su mirada, hay Paz.»</em>
+<p>La mayor autoridad de Perster. Hombre de fe <strong>genuina</strong>: bueno, caritativo y sinceramente convencido de que la doctrina salva vidas. Pero estricto hasta el hueso con las normas — cita la doctrina eclesiástica de memoria y la aplica sin excepciones, porque para él la disciplina es la forma más alta de amor. <em>Su perfil es conocido por los jugadores.</em></p>
+<p><strong>Relaciones:</strong> amigo cercano de la madre de Jared; considera al paladín el «hijo predilecto» de la congregación (incluso ahora que está bajo sospecha, lo que le duele y lo vuelve más severo con él, no menos) · autoridad directa sobre Guillermo a través del Padre Superior y el Monasterio · tolera a la Tía Elga a regañadientes y considera a Golnar un alma perdida por la que reza en voz alta.</p>
+<p><strong>Claves para el DM:</strong> es la cara amable y sincera de una institución podrida: <strong>él no conoce la verdad</strong>. Cree de corazón lo que predica, lo que lo convierte en un obstáculo trágico, no en un villano. En su día mandó destruir ciertos pergaminos del scriptorium... que nadie llegó a quemar (los conserva el Scriptorium de los Borrones que Guillermo conoce). Si la Iglesia cae, su fe se romperá con ella — y cómo reaccione entonces puede ser uno de los grandes momentos de la campaña.</p>
+<p><strong>Interpretación:</strong> voz suave que nunca necesita alzarse; bendice a la gente por su nombre; cita capítulo y versículo para cada situación. Frase clave: <em>«La norma no está para castigarte, hijo. Está para que llegues vivo a mañana».</em></p>
+<p><strong>Ficha:</strong> Ideal: la doctrina es el muro que nos mantiene vivos · Vínculo: su congregación, y la memoria de la madre de Jared · Defecto: su rigidez con las normas lo hace incapaz de ver que las normas también pueden ser el mal.</p>`},
+  {t:'Capitán Silas', s:'Comandante de la Guardia · el Escudo Cansado', b:`<em>«No me hables de honor, Aureus. El honor es un lujo de los que tienen el estómago lleno y el símbolo limpio.»</em>
+<p>Veterano de mil patrullas. Robusto, barba canosa, armadura abollada pero cuidada; huele a cuero viejo, metal y tabaco barato. Legal Neutral. No es un villano: es un hombre que ha aceptado que el mundo es gris y que la obediencia mantiene viva a la gente.</p>
+<p><strong>Personalidad:</strong> cinismo protector («sin el Ojo, estos salvajes se comerían entre ellos en una semana»). Lealtad de mentor hacia <strong>Jared Aureus</strong>: lo ve como el hijo que nunca tuvo, y su caída en desgracia le duele más de lo que admite. Cansancio moral: harto de los «sacrificios» y «purificaciones», se dice que solo cumple órdenes.</p>
+<p><strong>Lo que oculta:</strong> sabotaje administrativo (a veces «pierde» informes de ciudadanos que serían arrestados por faltas menores) · una vez vio algo en las puertas que no era «oscuridad devoradora» sino <em>algo humano</em>, y no lo olvida · teme que las órdenes de 1332 sean las que finalmente rompan su voluntad.</p>
+<p><strong>Interpretación:</strong> voz grave y llena de suspiros; se frota la nuca; evita mirar a los ojos al dar órdenes desagradables. Frase clave: <em>«Hazme un favor, muchacho… no me obligues a hacer mi trabajo hoy».</em></p>
+<p><strong>Ficha:</strong> Ideal: mantener la paz al coste que sea · Vínculo: la seguridad de Perster (aunque tenga que golpear a sus habitantes para salvarlos) · Defecto: su obediencia ciega lo hace cómplice de maldades que detesta · Especialidad: conoce todos los puntos ciegos de la vigilancia del pueblo.</p>`},
+  {t:'Bram el Campanero', s:'Torre del Vigía · el Oído del pueblo', b:`<em>«La vista es un regalo engañoso, muchacho. El metal… el metal no sabe mentir. Si la campana llora, es porque el pueblo sufre.»</em>
+<p>Ciego, de edad indefinida, piel curtida por el frío de las alturas, dedos callosos de tirar de sogas. Se mueve por la torre con agilidad sobrenatural. Neutral Bueno.</p>
+<p><strong>Personalidad:</strong> misticismo acústico — cree que el mundo es una melodía compuesta por Lochom, pero <em>alguien ha empezado a tocar notas falsas</em>. Paciencia infinita: mide el tiempo en campanadas y estaciones. No puede borrar lo que oye: si un grito suena en el Gueto a medianoche, lo guarda en la memoria.</p>
+<p><strong>Lo que «oye»:</strong> el muro de Perster «vibra» distinto cuando los Mensajeros de la Iglesia entran o salen · conoce canciones de hace 200 años, de antes de que el «Rostro del Silencio» (Mornac) prohibiera ciertos tonos · asegura que en 1332 el suelo bajo la torre <strong>late como un corazón hambriento</strong>.</p>
+<p><strong>Interpretación:</strong> susurro ronco como el roce de una cuerda; se interrumpe para escuchar cosas que los jugadores no oyen; toca las paredes buscando un pulso. Frase clave: <em>«Silencio… ¿oís eso? Es el sonido de una mentira cayendo al suelo».</em></p>
+<p><strong>Ficha:</strong> Ideal: la armonía es la única ley divina · Vínculo: la Gran Campana es su única amiga y confidente · Defecto: confunde sonidos del presente con ecos del pasado · Especialidad: identifica a cualquier habitante de Perster por el sonido de sus pasos.</p>`},
+  {t:'La Tía Elga', s:'Gueto · Matriarca y Guardiana de la Sopa', b:`<em>«En Sanctus, la Iglesia te promete el paraíso mañana para que te olvides de que tienes hambre hoy. Yo no prometo cielos, pero mi pan está recién horneado.»</em>
+<p>Tiefling anciana de piel color teja, cuernos romos limados por los años, manos siempre con harina, manojo de llaves a la cintura y rodillo que sirve para amasar y para echar guardias. Neutral Buena. Su cocina («La Cocina de Elga», piedra baja en el corazón del Gueto, puerta sin llave) es el único «Suelo Sagrado» real de Perster. <em>Su perfil de cara a los jugadores es público; lo de abajo NO.</em></p>
+<p><strong>Personalidad:</strong> pragmatismo radical — no reza: «los dioses no tienen oídos para los que tienen el estómago vacío». Maternal pero dura. Ve a la Princesa no como una llave política sino como una niña asustada. Es la única persona a la que los Pícaros respetan sin rechistar.</p>
+<p><strong>Lo que Elga sabe (privado):</strong> el <strong>Censo del Hambre</strong> — sabe exactamente cuánta gente falta en el Gueto cada mes y que las desapariciones han aumentado desde que empezó 1332 · qué guardias se compran con un pastel de carne y cuáles son fanáticos peligrosos · recuerda cuando el Gueto no tenía muros tan altos y guarda historias de la guerra de hace 600 años <em>que no coinciden con los frescos del Templo</em>.</p>
+<p><strong>Interpretación:</strong> voz ronca y pausada, autoridad que emana de la calma; siempre está haciendo algo con las manos. Frase clave: <em>«Cómete la sopa antes de que se enfríe, que las verdades amargas se pasan mejor con el vientre lleno».</em></p>
+<p><strong>Ficha:</strong> Ideal: nadie se va de mi mesa con hambre · Vínculo: el Gueto es mi familia; la Iglesia es el invierno · Defecto: prefiere una mentira piadosa que proteja a los suyos antes que una verdad que los ponga en peligro · Especialidad: detecta si alguien miente observando cómo come.</p>`},
+  {t:'Golnar «El Relator de Sombras»', s:'Gueto · Custodio de la Herejía y el Libro Negro', b:`<em>«Mi abuelo no estaba loco. Simplemente vio lo que había detrás de la cortina antes de que le cerraran los ojos para siempre.»</em>
+<p>Anciano tallado en raíz vieja, barba blanca descuidada, ojos azul acero que evalúan si eres espía del Templo. Vive en el <strong>Rincón de la Piedra Calva</strong>, un hueco en la pared del límite del Gueto donde ni los guardias quieren entrar. Caótico Bueno. Último descendiente del <strong>Hereje de la Puerta Norte</strong>. <em>Su fachada de «loco del pueblo» es pública; lo de abajo NO.</em></p>
+<p><strong>Personalidad:</strong> coraza de ermitaño — grosería como escudo. Bajo ella, un hombre profundamente solo con hambre de validación: ante un respeto genuino por su conocimiento (especialmente de alguien como <strong>Guillermo</strong>), la agresividad se desmorona.</p>
+<p><strong>El legado (privado):</strong> su abuelo era un alto cargo del censo que descubrió una irregularidad en los «sacrificios» de sangre y fue desterrado al exterior · guarda el <strong>Libro en Lenguaje Infernal</strong> de su abuelo pegado al pecho bajo los harapos · no sabe leerlo entero, pero reconoce patrones · sabe que los «Demonios» del exterior tienen conexión directa con los «Santos» del interior · <strong>el libro «reacciona» cuando la Princesa está cerca</strong>.</p>
+<p><strong>Interpretación:</strong> voz raspada; al principio grita, cuando confía baja a un susurro febril; abraza el libro constantemente y vigila buscando patrullas. Frase clave: <em>«¿Vas a escupirme como los demás o vas a sentarte y escuchar cómo el mundo que crees conocer se cae a pedazos?»</em></p>
+<p><strong>Ficha:</strong> Ideal: la verdad debe sobrevivir a los que intentan quemarla · Vínculo: el libro de mi abuelo es mi única herencia y mi carga · Defecto: su paranoia lo hace difícil de ayudar en momentos críticos · Especialidad: identifica sellos antiguos de la Iglesia que ya no se usan oficialmente.</p>`},
+  {t:'Korgath «El Verde»', s:'Gueto · el Prestamista del Barro', b:`<em>«El oro no tiene raza, y la sangre se limpia fácil. Pero una deuda… una deuda es para siempre.»</em>
+<p>Orco. Una anomalía en Perster: en un mundo que desprecia a los Afligidos, ha logrado que hasta los humanos más rectos le deban favores. Hombre de negocios que usa su fuerza como garantía. Base: el <strong>Almacén de Salazones</strong> (el olor a carne ahumada y sal oculta cualquier secreto) con su <strong>Cámara Fría</strong>, el sótano donde guarda los empeños y realiza los cobros difíciles.</p>
+<p><strong>Círculo de negocios:</strong> el tabernero (deudor crónico; lo mantiene a flote porque la taberna es el nido de rumores perfecto) · la Iglesia (pacto de silencio: él no ve los crímenes de la Guardia, ellos no ven sus préstamos) · <strong>Thrain</strong> (un deudor al que respeta por su fuerza; pero el respeto no paga intereses — <em>no confundir con Kvothe</em>).</p>
+<p><strong>Filosofía:</strong> «un cliente muerto no paga» — la matanza de tieflings le preocupa porque es <em>mal negocio</em>. Neutralidad brutal: su único dios es el libro de cuentas.</p>
+<p><strong>El secreto — El Diario de Sangre:</strong> lleva un registro de las desapariciones. Sabe que la sangre de los tieflings está siendo recolectada. <strong>Ese diario es la prueba de que la Iglesia alimenta la Miasma con sus propios ciudadanos.</strong></p>
+<p><strong>Nota DM:</strong> puede ser el aliado más valioso del grupo en el Gueto: armas, información y escondite si protegen a su «clientela». Rumor del mercado: <em>«El orco sabe por qué el carromato de la Iglesia sale siempre del Gueto con jarras que no llevan vino».</em></p>`}
+ ],
+ 'Manuales de Jugador':[
+  {t:'Jared de la Estirpe Aureus', s:'Paladín · El Oro de Perster', b:`<em>«El honor no se hereda solo en la sangre, se forja cada día bajo la mirada del Ojo.»</em>
+<p><strong>Linaje:</strong> los Aureus son sinónimo de la victoria en la Guerra Santa. Hijo del General Aureus, criado entre relatos de gloria y entrenamiento con acero. Es «la cara» de la justicia en el pueblo: la esperanza de que un nuevo General liderará el condado pronto.</p>
+<p><strong>Círculo:</strong> Capitán Silas (mentor; confía en él para tareas que requieren carisma y mano firme) · el Scriptorium de la Iglesia (pasado allí; habla Latín y Élfico) · <strong>Padre Valerius</strong>, amigo cercano de su madre, que lo considera el «hijo predilecto» de la congregación.</p>
+<p><strong>El Medallón de la familia:</strong> regalo de su madre a los 18 años; artesanía antigua, pesada y <em>fría al tacto</em>. Él lo cree un amuleto de la suerte, pero su presencia le da una determinación que otros envidian. <em>(El DM sabe lo que esto puede llegar a ser.)</em></p>
+<p><strong>Brújula interior:</strong> empatía — ha visto a tieflings y dracónidos sin motivo de odio; su instinto dice que el fuerte protege al débil sin importar la casta · La Duda: ¿el mal es realmente un demonio externo, o se esconde en la crueldad de los aldeanos? Esa duda es su secreto más profundo.</p>
+<p><strong>Verdades inamovibles (su fe actual):</strong> Perster es el Arca · el Año 1332 es el año del ascenso · el Orden es la Paz.</p>
+<p><strong>Situación:</strong> tras la pelea del mercado <strong>le han retirado el símbolo oficial</strong>: es «un Aureus bajo sospecha». Conserva el medallón familiar pero ya no lleva el sello que abría todas las puertas. <strong>Tiene la lanza de la Forastera.</strong></p>
+<p><strong>Sus lugares:</strong> El Círculo de Acero (club de esgrima privado) · la Armería de Helga «La Muda» · el Mirador de los Fundadores (balcón en la muralla interna hacia la Plaza Mayor) · Hostal «La Atalaya de Marfil» (suite reservada) · Refectorio de los Justos.</p>`},
+  {t:'Guillermo de Baskerville', s:'Clérigo erudito · Monasterio de la Santa Poda', b:`<em>«El conocimiento es la única luz que no proyecta sombras, pero a veces, lo que ilumina es más aterrador que la propia oscuridad.»</em>
+<p><strong>Pasado — el Sacrificio del Silencio:</strong> hijo de campesinos, entregado a la Iglesia bajo la frase «una boca menos que alimentar». Creció entre disciplina monástica y el frío de la morgue; aprendió anatomía con el sepulturero. Su refugio son los libros; su obsesión: el origen del mal.</p>
+<p><strong>Círculo:</strong> <strong>Jared Aureus</strong> (cliente y aliado: le suministra caros «tratos secretos» a cambio de copias privadas; es su puente a la nobleza) · <strong>Morn, el Sepulturero</strong> (mentor físico: «los cuerpos cuentan historias»; experto en medicina gracias a él) · el Padre Superior (la autoridad que lo asfixia: si descubre sus «negocios», el castigo será ejemplar).</p>
+<p><strong>El arte de la carne y el saber:</strong> cura heridas letales e identifica causas de muerte que la Iglesia llama «milagros» · políglota y copista (imita caligrafías antiguas perfectamente) · ha notado que los textos oficiales tienen «borrones» cuando hablan de lo demoníaco.</p>
+<p><strong>Su visión:</strong> la Iglesia es un velo — proporciona orden pero oculta la verdad · el respeto se gana con hechos · la aparición de la niña y la caída de Jared son la señal que esperaba.</p>
+<p><strong>Secreto actual:</strong> ha empezado a desatender sus votos. Realiza escapadas ilegales al pueblo y <strong>ha encontrado a un anciano con un libro en lenguaje Infernal</strong> (Golnar). Para un hombre de fe es pecado mortal; para un hombre de ciencia, el hallazgo de su vida.</p>
+<p><strong>Sus lugares:</strong> el Scriptorium de los Borrones (pergaminos que el Obispo mandó destruir pero nadie quemó) · el Herbolario de la Viuda Negra (vende ingredientes que no figuran en la lista oficial: belladona, fósforo) · la Morgue Subterránea (cámara fría conectada a un manantial helado) · el Scriptorium Secreto (donde guarda el material prohibido y las copias para Jared).</p>`},
+  {t:'Albion — «El Acorde de las Sombras»', s:'Dracónido · músico de los callejones', b:`<em>«Las cuerdas de una guitarra y los pernos de una cerradura hablan el mismo lenguaje: el de la vibración. Solo hay que saber escuchar.»</em>
+<p><strong>Naturaleza — Sangre en el Olvido:</strong> escamas blancas, translúcidas y ocultas bajo la ropa: el recordatorio de un linaje que la Iglesia prefiere ignorar. Creció sin nombre y sin familia en los callejones; la invisibilidad es su mejor armadura y el silencio su mejor aliado.</p>
+<p><strong>Círculo:</strong> el Pícaro Tiefling (Kvothe — aliado; comparten el gueto y el desprecio de los guardias) · «La Tía» Elga (refugio: en su cocina siempre hay un rincón para él; respeta su música y le ofrece cobijo cuando las patrullas se ponen nerviosas) · el Músico Borracho (quien olvidó la guitarra en el callejón y le dijo que quien la lleve, pero descuida su voz, encontrará la suya).</p>
+<p><strong>Dones dracónidos:</strong> oído absoluto (oye el mecanismo de una caja fuerte o los pasos de un guardia antes de doblar la esquina) · la vibración (al tocar, «siente» cuándo los pernos de una cerradura encajan) · visión en la penumbra.</p>
+<p><strong>Sus lugares:</strong> los bajos de la taberna · los tejados del Gueto · El Acorde Roto (taberna subterránea del gueto, el único sitio donde toca con los ojos cerrados sin que le miren las escamas) · el Saliente del Viento (gárgola descabezada con acústica perfecta) · el Taller de «Dedos Ágiles»: <strong>un viejo elfo que vive en un carromato</strong>, que le enseñó a afinar la guitarra y a usar ganzúas. <em>(Hilo hacia el Asentamiento.)</em></p>
+<p><strong>Su secreto — El Dragón Blanco:</strong> hace tres semanas, <strong>una criatura colosal de escamas blancas y ojos violetas le habló desde su tejado</strong>. Desde entonces sus sueños están llenos de campos de batalla y un apellido que resuena en su mente. Sabe que la «Consumación» de 1332 tiene algo que ver con él. Siente que Perster se le ha quedado pequeño: <em>«Es hora»</em>.</p>
+<p><strong>Nota de jugador:</strong> cuando vio al Paladín (Jared) en el mercado, le pareció el ejemplo de alguien que vive en una mentira de oro... y aun así, siente que las piezas de su sueño encajan. Su oído le dice que algo grande está por romperse en Perster.</p>`},
+  {t:'Kvothe — «El Alquimista de las Sombras»', s:'Tiefling · ex-cómico, químico y verdugo', b:`<em>«En la alquimia, como en la vida, el orden de los factores altera el producto. Si quieres que algo arda, primero debes saber qué es lo que lo mantiene unido.»</em>
+<p><strong>Pasado — el Silencio de los Cómicos:</strong> creció entre músicos y malabaristas tieflings. Al volver de un recado, encontró a su compañía ejecutada: una limpieza «ordenada, profesional, fría». Desde ese día sobrevive aprendiendo de los peores: el cerrajero borracho y el alquimista que usó como cobaya.</p>
+<p><strong>Habilidades:</strong> química y alquimia (ácidos que corroen el hierro, humos cegadores, brebajes que aceleran los reflejos) · maestro de la ganzúa (abre cerraduras por mecánica, no por fuerza) · analista de mentiras (años de tratar con políticos: detecta el engaño en el sudor o en el tono de voz).</p>
+<p><strong>Círculo:</strong> el Dracónido (Albion — compañero de oficio; sabe que tiene algo extraño en la sangre y no hace preguntas) · «La Tía» Elga (cobertura: le permite usar su cocina para sus mezclas a cambio de mantener a raya a los matones del mercado) · los «Clientes» Invisibles (secretarios que lo contratan para abrir cofres o preparar venenos; le dan piezas del rompecabezas sobre la muerte de su familia).</p>
+<p><strong>Su visión:</strong> logística, no fe (odia a la Iglesia por su eficiencia asesina: «una máquina que “limpia” lo que considera impuro») · venganza, no justicia · utilidad es supervivencia: se ha unido al grupo por puro cálculo... y cada uno de ellos es una herramienta para su fin.</p>
+<p><strong>Su secreto — El Verdugo:</strong> tiene la descripción de un hombre <strong>con un anillo o sello específico</strong> que estuvo en el mercado el día de la matanza. Busca esa marca en cada oficial de alto rango.</p>
+<p><strong>Nota de jugador:</strong> un Paladín sin símbolo es un hombre desesperado — la herramienta perfecta para infiltrarse donde un tiefling nunca podría entrar. La Princesa y su lanza son el cebo; tú eres el que sujeta el cuchillo.</p>
+<p><strong>Sus lugares:</strong> el Mercado del Gueto · el Laboratorio Abandonado (sótano húmedo; nadie se acerca porque dicen que está maldito) · los Salones de Servicio · el Callejón de los Destiladores · el Mirador de la Resaca (tejado sobre una destilería ilegal con vista a la salida trasera de la Mansión Aureus y la iglesia) · la tienda «Diente de Perro».</p>`},
+  {t:'La Princesa — «El Lirio y la Espina»', s:'Humana (Ymalean) · identidad secreta: la chica de campo', b:`<em>«En Ymalean aprendí que las palabras son para los aliados y el acero para el silencio. Mi madre me dio el nombre, pero la Capitana me dio la vida.»</em>
+<p><strong>Origen:</strong> heredera de Ymalean, la isla-fortaleza matriarcal. Doble educación: de día, la Voluntad de la Reina (diplomacia, etiqueta, alta política, <strong>idiomas antiguos</strong>; el acero le estaba prohibido); de noche, el Secreto de la Capitana (tutela clandestina en el arte de la lanza: la elegancia de corte convertida en danza defensiva letal).</p>
+<p><strong>Su máscara — la mentira necesaria:</strong> para el resto del grupo es una chica de campo aterrorizada que lo ha perdido todo esta noche. Historia oficial: vivía en una propiedad fronteriza con sus padres; unos asaltantes (¿demonios?) la quemaron hoy mismo. Si notan que es demasiado educada: su «padre», un ex-militar llamado <strong>Vinsmoke</strong>, estaba obsesionado con su educación. La lanza es «una vieja herramienta de defensa de la familia».</p>
+<p><strong>El vínculo con la Lanza:</strong> su único lazo físico con su madre y su hogar; artesanía real de Ymalean. <strong>Que Jared se la haya quedado la hace sentir despojada de su identidad: recuperarla es su prioridad absoluta</strong>, pero no puede parecer «demasiado experta» al pedirla.</p>
+<p><strong>Estado actual:</strong> la carnicería de su comitiva fue hace apenas unas horas. Paranoia (¿salvadores o captores?) y agotamiento físico. <strong>Sabe que las sombras que atacaron tenían cuernos: no eran simples bandidos.</strong></p>
+<p><strong>Lo que ella sabe (y los demás no):</strong> habla con fluidez lenguas que Guillermo apenas empieza a estudiar · maneja la lanza mejor que muchos guardias · conoce el exterior.</p>
+<p><strong>Secreto de jugadora — el Acorde de Ymalean:</strong> la música o los sonidos rítmicos (como la guitarra del Dracónido) la calman y le permiten recordar las lecciones de la Capitana: <strong>bonificador oculto a percepción cuando hay música</strong>.</p>
+<p><strong>Interpretación:</strong> no da explicaciones si no se las piden · observa constantemente las manos de Jared (cada vez que toca la lanza, escalofrío) · a veces se sienta demasiado recta o come con elegancia impropia; si la pillan, finge torpeza. Ideal: volver a Ymalean y proteger su linaje · Defecto: su orgullo desprecia inconscientemente las costumbres «bárbaras» de Perster.</p>`}
+ ]
+};
+
+let activeLoreCat = 'Historia';
+function renderLoreCats(){
+  const bar = document.getElementById('lore-cats');
+  bar.innerHTML = Object.keys(LORE).map(c=>
+    `<button class="${c===activeLoreCat?'active':''}" onclick="setLoreCat('${c}')">${c}</button>`).join('');
+}
+function setLoreCat(c){ activeLoreCat=c; renderLoreCats(); renderLore(); }
+function renderLore(){
+  const q = document.getElementById('lore-search').value.trim().toLowerCase();
+  const list = document.getElementById('lore-list');
+  let items;
+  if(q){
+    items = [];
+    for(const cat in LORE) for(const it of LORE[cat]) {
+      if((it.t+' '+it.s+' '+it.b).toLowerCase().includes(q)) items.push({...it, cat});
+    }
+  } else {
+    items = LORE[activeLoreCat].map(it=>({...it, cat:activeLoreCat}));
+  }
+  if(!items.length){ list.innerHTML = '<p class="hint" style="text-align:center;padding:30px">Las crónicas no mencionan nada al respecto.</p>'; return; }
+  list.innerHTML = items.map(it=>`
+    <details class="lore" ${q?'open':''}>
+      <summary>${it.t}<span class="sub">${it.s}${q? ' · '+it.cat:''}</span></summary>
+      <div class="body"><p>${it.b}</p></div>
+    </details>`).join('');
+}
+document.getElementById('lore-search').addEventListener('input', renderLore);
+
+/* ================================================================
+   IA — API DE GOOGLE GEMINI (gemini-2.5-flash, capa gratuita)
+================================================================ */
+const AI_LORE_CONTEXT = `Eres el asistente del Dungeon Master de una campaña de D&D 5e en el mundo de AETHELGARD. Contexto canónico (SOLO para el DM; puedes usar spoilers libremente porque esta salida es para el DM):
+
+AÑO 1332. Hace 666 años, el rey Malachar Sorreth III hizo el Pacto de las Seis Sombras con seis demonios (Ghorum, Kull, Vultun, Stratos, Ixor, Mornac) para conquistar el imperio rival de Valdris. El pacto trajo la Miasma (niebla mortal que es en realidad un ritual activo alimentado con sangre, sobre todo de tieflings), nuevas razas (tieflings, dracónidos, orcos, llamadas "Afligidas") y seis objetos de poder dispersos. Quien muere por la Miasma se convierte en Ghoul (carcasa sin alma; las almas quedan atrapadas en el Sudario de Kull).
+La Iglesia del Ojo de Lochom adora a los seis demonios disfrazados de dioses, controla toda la información, el comercio y la sal; su Inquisición persigue la herejía; el Papa Caron Vel Ashe (porta el Anillo de Vultun fundido a su dedo, ve por los ojos de quien mira el símbolo del Ojo) quiere reunir los seis objetos para la Consumación (invocar físicamente a los demonios). El idioma común antiguo fue rebautizado "Infernal" para criminalizar los textos antiguos. El Códice de Elian es el diario de un hombre de Perster que salió hace 600 años y documentó la verdad; su ghoul vaga bajo el Gran Santuario de Shiford.
+Reinos: Gran Ducado de Bertonsia (Inglaterra medieval, Duque Aldric Veyne III, AQUÍ ESTÁ PERSTER), Imperio Bramber (Roma tardía, Emperador Caius Dorn, Balanza de Stratos), Baresdonia (Escandinavia, Rey Edran Thal, Espejo de Ixor), Tearquía de Gobgar (Bizancio teocrático, Cuatro Tearcas, sede del Papa en Ilmzois), Principado de Ilm (Princesa Regent Sova Mirn, Cayado de Mornac), Ducado de Ymalean (isla matriarcal, vestigio de Valdris, Kýria Thessara, Forjadoras del Eco, Lanza purificada de Ghorum en manos de la Princesa, que acaba de llegar a Perster huyendo de la Inquisición).
+LA PARTIDA: grupo de 5 jugadores de nivel 2-3 en el pueblo amurallado de Perster (Bertonsia), también llamado "Sanctus" en la jerga eclesiástica. Distritos: Purple Well (NO, junto al bosque), Cotton Shade (NE), Market District (centro, con la Plaza Mayor) y Black Borough (sur: el Gueto de los Afligidos). Lugares clave: Plaza Mayor, Monasterio de la Santa Poda (con morgue subterránea y scriptorium), taberna El Descanso del Peregrino, el Gueto, Torre del Vigía, la Cocina de la Tía Elga (gueto), Almacén de Salazones de Korgath (límite del gueto).
+LOS PJ: Jared de la Estirpe Aureus (paladín humano, hijo del General Aureus, bajo sospecha tras la pelea del mercado, le retiraron el símbolo oficial; lleva un medallón familiar antiguo y frío; tiene la lanza de la Princesa; protegido del Padre Valerius), Guillermo de Baskerville (clérigo erudito del Monasterio de la Santa Poda; anatomista, políglota, copista; hace escapadas ilegales; ha contactado con Golnar y su libro en Infernal), Albion (dracónido de escamas blancas, músico-pícaro de los callejones, oído absoluto; hace 3 semanas un dragón blanco colosal de ojos violetas le habló desde su tejado; aprendiz del viejo elfo del carromato "Dedos Ágiles"), Kvothe (tiefling alquimista-pícaro, ex-cómico; su compañía fue ejecutada; busca a un hombre con un anillo/sello concreto), y la Princesa de Ymalean encubierta como "chica de campo" (su comitiva fue masacrada por atacantes con cuernos hace horas; historia falsa: granja quemada, padre ex-militar "Vinsmoke"; quiere recuperar su lanza, que custodia Jared).
+PNJ CLAVE DE PERSTER: Padre Valerius (la máxima autoridad del pueblo; hombre de fe genuino, bueno pero estricto con las normas y muy dado a la doctrina eclesiástica; conocido por todos los jugadores), Capitán Silas (comandante de la guardia, cínico protector, mentor de Jared, sabotea arrestos en silencio), Bram el Campanero (ciego de la Torre del Vigía; oye que el suelo "late" en 1332; conoce canciones prohibidas de hace 200 años), la Tía Elga (tiefling matriarca del gueto; lleva el "censo del hambre" de los desaparecidos), Golnar "El Relator de Sombras" (paria, nieto del Hereje de la Puerta Norte; custodia un libro en Infernal que reacciona cerca de la Princesa), Korgath "El Verde" (orco prestamista del Almacén de Salazones; su Diario de Sangre registra las desapariciones y prueba que la Iglesia recolecta sangre tiefling), Thrain (deudor de Korgath, distinto de Kvothe), Morn el Sepulturero, Helga "La Muda" (armera).
+DOCTRINA PÚBLICA (panfleto "El Orden de la Luz"): la Luz Primigenia y sus Seis Rostros (los demonios disfrazados), el Ritual de la Sangre y la Sal, 1332 como "Año de la Consumación" presentado como jubileo gozoso, los Afligidos como almas de carga más pesada, el "Afuera" como Velo de la Oscuridad.
+TONO: medieval oscuro, opresión silenciosa, misterio, horror contenido. La Iglesia es omnipresente y educadamente siniestra.
+FORMATO: responde en español, usando Markdown sencillo (## títulos, **negrita**, listas con -). Sé concreto y útil en mesa.`;
+
+/* Clave por defecto de la campaña (Google AI Studio). Puede sobreescribirse
+   desde Ajustes; si el campo se guarda vacío, se vuelve a usar esta. */
+const DEFAULT_API_KEY = 'AQ.Ab8RN6KksIZzI6Z1b5nPodLzo70S6XC_ToOGNffPamXZXfBj_A';
+function getApiKey(){ return localStorage.getItem(LS.key) || DEFAULT_API_KEY; }
+function saveApiKey(){
+  const v = document.getElementById('api-key').value.trim();
+  if(v) localStorage.setItem(LS.key, v);
+  else localStorage.removeItem(LS.key); // vacío = volver a la clave por defecto
+  flash('key-saved');
+}
+
+/* ================================================================
+   PUBLICACIÓN EN GITHUB — sube data/public.json vía API de contenidos
+================================================================ */
+function getGhConfig(){ return load('ae_gh', {owner:'', repo:'', branch:'main', token:''}); }
+function saveGhConfig(){
+  save('ae_gh', {
+    owner: document.getElementById('gh-owner').value.trim(),
+    repo: document.getElementById('gh-repo').value.trim(),
+    branch: document.getElementById('gh-branch').value.trim() || 'main',
+    token: document.getElementById('gh-token').value.trim()
+  });
+  flash('gh-saved');
+}
+function pubStatus(msg, isError){
+  const el = document.getElementById('pub-status');
+  el.textContent = msg;
+  el.style.color = isError? '#d07060' : '#8fae6b';
+}
+async function publishData(){
+  const gh = getGhConfig();
+  if(!gh.owner || !gh.repo || !gh.token){
+    pubStatus('Falta configurar GitHub: ve a Ajustes → Publicación en GitHub.', true);
+    return;
+  }
+  const btn = document.getElementById('pub-btn');
+  btn.disabled = true;
+  pubStatus('Publicando...');
+  try{
+    // Solo contenido público: diario (sin notas DM) y fichas. Nada privado.
+    const payload = {updated: new Date().toISOString(), chars: chars, diary: localDiary()};
+    const json = JSON.stringify(payload, null, 2);
+    const b64 = btoa(unescape(encodeURIComponent(json)));
+    const api = `https://api.github.com/repos/${gh.owner}/${gh.repo}/contents/data/public.json`;
+    const headers = {
+      'Authorization': 'Bearer '+gh.token,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json'
+    };
+    // sha del archivo existente (si lo hay), necesario para sobreescribir
+    let sha = null;
+    const cur = await fetch(`${api}?ref=${gh.branch}&t=${Date.now()}`, {headers, cache:'no-store'});
+    if(cur.ok){ sha = (await cur.json()).sha; }
+    else if(cur.status !== 404){ throw new Error('No se pudo leer el repositorio (HTTP '+cur.status+'). ¿Usuario/repo/token correctos?'); }
+    const put = await fetch(api, {
+      method:'PUT', headers,
+      body: JSON.stringify({
+        message: 'Publicar diario y fichas — '+new Date().toLocaleString('es-ES'),
+        content: b64,
+        branch: gh.branch,
+        ...(sha? {sha} : {})
+      })
+    });
+    if(!put.ok){
+      let m = 'HTTP '+put.status;
+      try{ m += ': '+(await put.json()).message; }catch(_){}
+      throw new Error(m);
+    }
+    publicData = payload;
+    pubStatus('✓ Publicado. Los jugadores lo verán en uno o dos minutos (caché de GitHub).');
+  }catch(e){
+    pubStatus('Error al publicar — '+e.message, true);
+  }finally{ btn.disabled = false; }
+}
+const AI_MODEL = 'gemini-2.5-flash'; // modelo gratuito de Google AI Studio
+async function callAI(userPrompt, maxTokens){
+  const key = getApiKey();
+  if(!key) throw new Error('No hay clave de API guardada. Ve a Ajustes y guarda tu clave gratuita de Google AI Studio (aistudio.google.com/apikey).');
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${AI_MODEL}:generateContent`,{
+    method:'POST',
+    headers:{
+      'content-type':'application/json',
+      'x-goog-api-key':key
+    },
+    body: JSON.stringify({
+      system_instruction:{parts:[{text:AI_LORE_CONTEXT}]},
+      contents:[{role:'user',parts:[{text:userPrompt}]}],
+      generationConfig:{maxOutputTokens: maxTokens||1800, temperature:0.9, thinkingConfig:{thinkingBudget:0}}
+    })
+  });
+  if(!res.ok){
+    let msg = 'Error '+res.status;
+    try{ const e = await res.json(); msg += ': '+(e.error&&e.error.message||''); }catch(_){}
+    throw new Error(msg);
+  }
+  const data = await res.json();
+  const cand = data.candidates && data.candidates[0];
+  if(!cand || !cand.content || !cand.content.parts) throw new Error('La IA no devolvió texto (¿bloqueo de seguridad o cuota agotada?).');
+  return cand.content.parts.map(p=>p.text||'').join('');
+}
+async function runGen(btnId, outId, prompt, maxTokens){
+  const btn = document.getElementById(btnId), out = document.getElementById(outId);
+  btn.disabled = true;
+  out.innerHTML = '<div class="spinner">Las plumas invisibles escriben...</div>';
+  try{
+    const text = await callAI(prompt, maxTokens);
+    out.innerHTML = md(text) + `<button class="btn ghost sm" onclick="copyOut('${outId}', this)">⎘ Copiar texto</button>`;
+    out.dataset.raw = text;
+  }catch(e){
+    out.innerHTML = '<div class="placeholder">El ritual ha fallado.</div><div class="error-box">'+esc(e.message)+'</div>';
+  }finally{ btn.disabled = false; }
+}
+function copyOut(outId, btn){
+  const raw = document.getElementById(outId).dataset.raw || '';
+  navigator.clipboard.writeText(raw).then(()=>{ btn.textContent='✓ Copiado'; setTimeout(()=>btn.textContent='⎘ Copiar texto',1500); });
+}
+
+/* ··· Generador de Almas de Perster (4d10), tabla canónica del manual ··· */
+const SOUL_TABLE = {
+  oficio:['Repartidor de Sal','Limpiador de Iconos','Lavandera de Capas','Vendedor de Velas','Mozo de Pozo','Copista de Edictos','Afilador de Dagas','Recogedor de Cera','Pregonero Menor','Cosedor de Sacos'],
+  animo:['Paranoico','Fervoroso','Agotado','Melancólico','Irritable','Inquietante','Sospechoso','Distraído','Aterrorizado','Cínico'],
+  problema:['Lleva un saco roto y teme un castigo sagrado','Cree que una estatua le ha hablado','Ha perdido la capa de un oficial','Le debe plata a un tipo peligroso','Su ración de pan estaba mohosa','Ha visto algo tras el muro del pueblo','Sabe quién robó en el mercado ayer','Ha olvidado el rezo del mediodía','Ha perdido la voz por el miedo','Cree que el Año 1332 es una mentira'],
+  rasgo:['Le falta un dedo en la mano derecha','Tose constantemente polvo de piedra','Tiene las manos rojas y agrietadas por la lejía','Huele intensamente a sebo rancio','Lleva un parche en el ojo, sucio','Tiene manchas de tinta negra hasta los codos','Lleva una campana pequeña al cuello','Camina con una cojera muy marcada','Viste una túnica tres tallas más grande','Tiene una cicatriz en forma de cruz']
+};
+let lastSoul = null;
+function rollSoul(){
+  const d = ()=> Math.floor(Math.random()*10);
+  const r = [d(),d(),d(),d()];
+  lastSoul = {
+    dados: r.map(x=>x+1),
+    oficio: SOUL_TABLE.oficio[r[0]],
+    animo: SOUL_TABLE.animo[r[1]],
+    problema: SOUL_TABLE.problema[r[2]],
+    rasgo: SOUL_TABLE.rasgo[r[3]]
+  };
+  document.getElementById('soul-out').innerHTML = `
+    <div class="parchment deco-corner" style="padding:18px 24px">
+      <div class="session-meta" style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:#7a6232">DADOS: ${lastSoul.dados.join(' · ')}</div>
+      <h3 style="margin:6px 0 8px">${lastSoul.oficio} ${lastSoul.animo.toLowerCase()}</h3>
+      <p><strong>Pequeño problema:</strong> ${lastSoul.problema.toLowerCase()}.</p>
+      <p><strong>Rasgo distintivo:</strong> ${lastSoul.rasgo.toLowerCase()}.</p>
+      <button class="btn ghost sm" onclick="soulToAI()">✦ Desarrollar este PNJ con IA</button>
+    </div>`;
+}
+function soulToAI(){
+  if(!lastSoul) return;
+  document.getElementById('pnj-extra').value =
+    `Desarrolla este resultado del Generador de Almas: un ${lastSoul.oficio} de Perster, de ánimo ${lastSoul.animo.toLowerCase()}; ${lastSoul.problema.toLowerCase()}; ${lastSoul.rasgo.toLowerCase()}.`;
+  document.getElementById('pnj-race').value = 'Cualquiera (decide la IA)';
+  document.getElementById('pnj-role').value = 'Habitante de Perster';
+  genNPC();
+}
+
+function genEncounter(){
+  const lvl = document.getElementById('enc-level').value;
+  const n = document.getElementById('enc-players').value;
+  const env = document.getElementById('enc-env').value;
+  const diff = document.getElementById('enc-diff').value;
+  const theme = document.getElementById('enc-theme').value.trim();
+  runGen('enc-btn','enc-out',
+`Genera un encuentro de D&D 5e para un grupo de ${n} jugadores de nivel ${lvl}.
+Entorno: ${env}. Dificultad deseada: ${diff}.${theme? '\nTema/detalle: '+theme:''}
+
+Estructura la respuesta así:
+## [Nombre evocador del encuentro]
+**Escenario:** descripción atmosférica del lugar y la situación (4-6 frases, lista para leer en voz alta).
+**Enemigos:** lista con cantidad, nombre de criatura 5e (o adaptación con stats clave: CA, PG, ataque, daño, rasgos especiales) ajustada a la dificultad ${diff} para ${n} PJ de nivel ${lvl}.
+**Tácticas:** cómo combaten y cuándo huyen o negocian.
+**Complicación:** un giro o elemento dinámico del entorno.
+**Consecuencias narrativas:** qué cambia en Perster/la trama si los PJ ganan, pierden o evitan el combate, coherente con el lore de Aethelgard.
+**Botín y pistas:** recompensas apropiadas al nivel, incluyendo si procede alguna pista sutil hacia los misterios del mundo.`, 2000);
+}
+function genNPC(){
+  const race = document.getElementById('pnj-race').value;
+  const role = document.getElementById('pnj-role').value;
+  const extra = document.getElementById('pnj-extra').value.trim();
+  runGen('pnj-btn','pnj-out',
+`Genera un PNJ para la campaña.
+Raza: ${race}. Rol/ubicación: ${role}.${extra? '\nDetalle adicional: '+extra:''}
+
+Estructura la respuesta así:
+## [Nombre completo y apodo si procede]
+**Raza y oficio:** una línea.
+**Descripción física:** 3-4 frases vívidas y fáciles de interpretar en mesa.
+**Personalidad:** rasgos, manera de hablar, una manía o gesto característico.
+**Lo que muestra:** lo que cualquiera ve u oye de él/ella en Perster.
+**Secreto:** algo que oculta, coherente con el lore (puede rozar los grandes misterios sin revelarlos gratuitamente).
+**Gancho narrativo:** cómo puede involucrar a los PJ (nivel 2-3) en una trama o pista.
+**En la mesa:** una frase típica suya, entre comillas.`, 1500);
+}
+function genDoc(){
+  const type = document.getElementById('doc-type').value;
+  const theme = document.getElementById('doc-theme').value.trim();
+  runGen('doc-btn','doc-out',
+`Redacta un documento de ambientación para entregar o leer a los jugadores.
+Tipo: ${type}.${theme? '\nTema/propósito: '+theme:''}
+
+Requisitos:
+- Escribe el documento COMPLETO con su voz y formato propios (encabezados, fórmulas rituales de la Iglesia, firmas, fechas del año 1332, manchas o roturas indicadas entre corchetes si procede).
+- Tono coherente con Aethelgard: la Iglesia es solemne y educadamente amenazante; los documentos populares son supersticiosos y cautos.
+- Si el tipo lo permite, incluye UNA pista sutil o detalle que un jugador atento pueda relacionar con los misterios del mundo, sin revelar spoilers de forma explícita.
+- Tras el documento, añade una sección "**Notas para el DM**" explicando qué hilo toca y cómo usarlo.`, 1800);
+}
+
+/* ================================================================
+   GESTOR DE SESIONES
+================================================================ */
+let saveTimer = null;
+function flash(id){
+  const el = document.getElementById(id);
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),1400);
+}
+function persistSessions(){ save(LS.sessions, sessions); renderPublicDiary(); flash('plot-saved'); }
+
+function renderSessions(){
+  const list = document.getElementById('session-list');
+  list.innerHTML = sessions.map((s,i)=>`
+    <div class="session-card">
+      <div class="head">
+        <span class="num">S${s.num}</span>
+        <input type="text" value="${esc(s.title||'')}" placeholder="Título de la sesión" oninput="upS(${i},'title',this.value)">
+        <input type="text" value="${esc(s.date||'')}" placeholder="Fecha" style="max-width:140px" oninput="upS(${i},'date',this.value)">
+        <button class="btn danger sm" style="margin-top:0" onclick="delSession(${i})">✕</button>
+      </div>
+      <label class="f">Jugadores presentes</label>
+      <div class="chips">
+        ${chars.map((c,ci)=>`<label><input type="checkbox" ${s.present&&s.present.includes(ci)?'checked':''} onchange="togglePresent(${i},${ci},this.checked)">${esc(c.name)}</label>`).join('')}
+      </div>
+      <label class="f">Notas del DM (privadas)</label>
+      <textarea oninput="upS(${i},'dm',this.value)">${esc(s.dm||'')}</textarea>
+      <label class="f">Resumen público (visible en el Diario de los jugadores — ¡sin spoilers!)</label>
+      <textarea oninput="upS(${i},'pub',this.value)">${esc(s.pub||'')}</textarea>
+    </div>`).join('');
+}
+function upS(i, field, val){
+  sessions[i][field] = val;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(persistSessions, 500);
+}
+function togglePresent(i, ci, on){
+  sessions[i].present = sessions[i].present || [];
+  if(on && !sessions[i].present.includes(ci)) sessions[i].present.push(ci);
+  if(!on) sessions[i].present = sessions[i].present.filter(x=>x!==ci);
+  persistSessions();
+}
+function newSession(){
+  const num = sessions.length? Math.max(...sessions.map(s=>s.num))+1 : 1;
+  sessions.push({num, title:'', date:'', present:[], dm:'', pub:''});
+  save(LS.sessions, sessions);
+  renderSessions();
+}
+function delSession(i){
+  if(!confirm('¿Borrar la sesión '+sessions[i].num+' por completo? Esta acción no se puede deshacer.')) return;
+  sessions.splice(i,1);
+  persistSessions(); renderSessions();
+}
+/* estado de la trama */
+const plotEl = document.getElementById('plot-state');
+plotEl.value = load(LS.plot, 'La Princesa ha llegado a Perster huyendo del ataque de la Inquisición, con la Lanza. El grupo (nivel 2-3) empieza a tirar de los primeros hilos. Guillermo tiene fragmentos del Códice de Elian.');
+plotEl.addEventListener('input', ()=>{
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{ save(LS.plot, plotEl.value); flash('plot-saved'); }, 500);
+});
+
+/* ================================================================
+   EDITOR DE FICHAS
+================================================================ */
+function renderCharEditor(){
+  const el = document.getElementById('char-editor');
+  el.innerHTML = chars.map((c,i)=>`
+    <div class="session-card">
+      <div class="head">
+        <input type="text" value="${esc(c.name)}" placeholder="Nombre" oninput="upC(${i},'name',this.value)">
+        <input type="text" value="${esc(c.clase)}" placeholder="Clase" style="max-width:170px" oninput="upC(${i},'clase',this.value)">
+        <input type="text" value="${esc(c.raza)}" placeholder="Raza" style="max-width:170px" oninput="upC(${i},'raza',this.value)">
+        <button class="btn danger sm" style="margin-top:0" onclick="delChar(${i})">✕</button>
+      </div>
+      <label class="f">Descripción pública</label>
+      <textarea oninput="upC(${i},'desc',this.value)">${esc(c.desc)}</textarea>
+      <label class="f">Motivación visible</label>
+      <textarea style="min-height:60px" oninput="upC(${i},'mot',this.value)">${esc(c.mot)}</textarea>
+    </div>`).join('');
+}
+function upC(i, field, val){
+  chars[i][field] = val;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{ save(LS.chars, chars); renderPublicChars(); renderSessions(); }, 500);
+}
+function newChar(){
+  chars.push({name:'Nuevo personaje', clase:'—', raza:'—', desc:'', mot:''});
+  save(LS.chars, chars);
+  renderCharEditor(); renderPublicChars(); renderSessions();
+}
+function delChar(i){
+  if(!confirm('¿Eliminar la ficha de '+chars[i].name+'?')) return;
+  chars.splice(i,1);
+  sessions.forEach(s=>{ s.present = (s.present||[]).filter(x=>x!==i).map(x=> x>i? x-1: x); });
+  save(LS.chars, chars); save(LS.sessions, sessions);
+  renderCharEditor(); renderPublicChars(); renderSessions();
+}
+function resetAll(){
+  if(!confirm('Esto borrará TODAS las sesiones, fichas, el estado de la trama, la clave API y la configuración de GitHub guardadas en este navegador. ¿Continuar?')) return;
+  [LS.key,LS.sessions,LS.chars,LS.plot,'ae_gh'].forEach(k=>localStorage.removeItem(k));
+  location.reload();
+}
+
+/* ================================================================
+   INICIO
+================================================================ */
+initMap();
+renderPublicDiary();
+renderPublicChars();
+renderLoreCats();
+renderLore();
+renderSessions();
+renderCharEditor();
+document.getElementById('api-key').value = localStorage.getItem(LS.key) || '';
+(function(){
+  const gh = getGhConfig();
+  document.getElementById('gh-owner').value = gh.owner||'';
+  document.getElementById('gh-repo').value = gh.repo||'';
+  document.getElementById('gh-branch').value = gh.branch||'main';
+  document.getElementById('gh-token').value = gh.token||'';
+})();
+loadPublicData(); // diario y fichas publicados para los jugadores
+</script>
+</body>
+</html>

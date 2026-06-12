@@ -1,0 +1,60 @@
+{
+  "updated": "2026-06-12T00:00:00.000Z",
+  "chars": [
+    {
+      "name": "Jared de la Estirpe Aureus",
+      "clase": "Paladín",
+      "raza": "Humano",
+      "desc": "Hijo del General Aureus, el linaje más ilustre de Perster. Imponente, recto y cortés, criado entre los bancos de la iglesia y los campos de entrenamiento. Tras el altercado del mercado, le ha sido retirado el símbolo oficial, y el pueblo murmura: un Aureus bajo sospecha.",
+      "mot": "Demostrar que el honor de su apellido sigue intacto y proteger a la gente de Perster."
+    },
+    {
+      "name": "Guillermo de Baskerville",
+      "clase": "Clérigo erudito",
+      "raza": "Humano",
+      "desc": "Monje del Monasterio de la Santa Poda, entregado a la Iglesia de niño. Manos manchadas de tinta, mirada de quien lee más de lo que duerme. Conoce la anatomía, las hierbas y los pergaminos mejor que nadie en el pueblo, y hace demasiadas preguntas para gusto de sus superiores.",
+      "mot": "El conocimiento es la única luz que no proyecta sombras: entenderlo todo, aunque cueste."
+    },
+    {
+      "name": "Albion",
+      "clase": "Músico (Pícaro)",
+      "raza": "Dracónido",
+      "desc": "Músico de los callejones, de escamas pálidas que asoman bajo la ropa y oído imposible de engañar. Creció sin nombre y sin familia entre los tejados y los bajos de la taberna, donde su guitarra vale más que cualquier moneda. Aprendió el oficio —y alguna otra habilidad— de un viejo elfo que vive en un carromato.",
+      "mot": "Que su música suene en lugares donde a un Afligido ni siquiera le dejan entrar."
+    },
+    {
+      "name": "Kvothe",
+      "clase": "Alquimista (Pícaro)",
+      "raza": "Tiefling",
+      "desc": "Antiguo cómico de una compañía itinerante, hoy boticario de oficio impreciso en los límites del Gueto. Frío, metódico y de pocas bromas para haber sido del gremio del espectáculo. Sabe de ácidos, brebajes y cerraduras, y detecta una mentira en el sudor de quien la dice.",
+      "mot": "Cobrar lo que se le debe, saldar lo que debe, y que nadie vuelva a pillarle desprevenido."
+    },
+    {
+      "name": "La Forastera",
+      "clase": "Superviviente",
+      "raza": "Humana",
+      "desc": "Una joven campesina llegada esta misma noche, agotada y cubierta del polvo del camino. Cuenta que unos asaltantes quemaron la propiedad fronteriza donde vivía con sus padres, y que su padre, un ex-militar llamado Vinsmoke, le enseñó modales y disciplina. Carga una vieja lanza de la familia de la que no se separa... aunque ahora la custodia Jared.",
+      "mot": "Sobrevivir, encontrar un lugar seguro y recuperar lo único que le queda de su hogar."
+    }
+  ],
+  "diary": [
+    {
+      "num": 1,
+      "title": "La Cosecha del Ojo",
+      "date": "",
+      "pub": "Era el día de la Cosecha del Ojo, la gran festividad del otoño. Perster entero se volcó en la Plaza Mayor: música, comida comunitaria, el diezmo entregado a la Iglesia y un sermón que se hizo eterno. Entre el bullicio, nuestros caminos se cruzaron por primera vez. Antes de que terminara la jornada, ya estaba claro que aquel no iba a ser un festival como los demás."
+    },
+    {
+      "num": 2,
+      "title": "Forasteros y rumores",
+      "date": "",
+      "pub": "Los rumores corrían por la taberna más rápido que la cerveza: se hablaba de una joven forastera llegada al pueblo, de movimientos extraños en torno al almacén de Korgath y de que la Tía Elga sabía más de lo que contaba. Decidimos meter las narices donde nadie nos llamaba."
+    },
+    {
+      "num": 3,
+      "title": "Sombras tras el muro",
+      "date": "",
+      "pub": "Lo que descubrimos nos dejó más preguntas que respuestas. La Torre del Vigía hizo sonar la campana por primera vez en años, y comprendimos que los muros de Perster no nos protegen de todo lo que se mueve en la oscuridad. Algo ha empezado, y ya no hay vuelta atrás."
+    }
+  ]
+}

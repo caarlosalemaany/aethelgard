@@ -642,7 +642,7 @@ footer{text-align:center;color:#5a4a30;font-size:14px;font-style:italic;padding:
    ESTADO Y PERSISTENCIA
 ================================================================ */
 const LS = {
-  key:'ae_api_key', sessions:'ae_sessions', chars:'ae_chars_v3', plot:'ae_plot', unlocked:'ae_dm_unlocked'
+  key:'ae_api_key', sessions:'ae_sessions', chars:'ae_chars_v3', plot:'ae_plot', unlocked:'ae_dm_unlocked', published:'ae_published'
 };
 const DM_PASSWORD = 'aethelgard1332';
 
@@ -804,11 +804,21 @@ async function loadPublicData(){
   const urls = [];
   if(gh.owner && gh.repo) urls.push(`https://raw.githubusercontent.com/${gh.owner}/${gh.repo}/${gh.branch||'main'}/data/public.json?t=${Date.now()}`);
   urls.push('data/public.json?t='+Date.now());
+  let fetched = null;
   for(const u of urls){
     try{
       const r = await fetch(u, {cache:'no-store'});
-      if(r.ok){ publicData = await r.json(); break; }
+      if(r.ok){ fetched = await r.json(); break; }
     }catch(e){ /* sin red o archivo inexistente: usamos datos locales */ }
+  }
+  // GitHub Pages tarda 1-2 min en servir lo recién publicado: si en este
+  // navegador hay una publicación más reciente que lo que devuelve el
+  // servidor, gana la copia local (los jugadores convergen solos después).
+  const lastPublished = load(LS.published, null);
+  if(fetched && lastPublished){
+    publicData = new Date(lastPublished.updated||0) > new Date(fetched.updated||0)? lastPublished : fetched;
+  } else {
+    publicData = fetched || lastPublished;
   }
   renderPublicDiary();
   renderPublicChars();
@@ -1152,6 +1162,7 @@ async function publishData(){
       throw new Error(m);
     }
     publicData = payload;
+    save(LS.published, payload); // copia local: este navegador ve lo publicado al instante
     pubStatus('✓ Publicado. Los jugadores lo verán en uno o dos minutos (caché de GitHub).');
   }catch(e){
     pubStatus('Error al publicar — '+e.message, true);
@@ -1386,7 +1397,7 @@ function delChar(i){
 }
 function resetAll(){
   if(!confirm('Esto borrará TODAS las sesiones, fichas, el estado de la trama, la clave API y la configuración de GitHub guardadas en este navegador. ¿Continuar?')) return;
-  [LS.key,LS.sessions,LS.chars,LS.plot,'ae_gh'].forEach(k=>localStorage.removeItem(k));
+  [LS.key,LS.sessions,LS.chars,LS.plot,LS.published,'ae_gh'].forEach(k=>localStorage.removeItem(k));
   location.reload();
 }
 

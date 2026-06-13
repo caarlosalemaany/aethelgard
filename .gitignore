@@ -1,0 +1,8 @@
+# Material privado del DM: NUNCA debe subirse al repositorio público
+*.pdf
+lore_extract.txt
+pdfs_extract.txt
+
+# Configuración local de herramientas
+.claude/
+_tmp_render/

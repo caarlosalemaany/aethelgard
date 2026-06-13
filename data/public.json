@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-12T19:35:01.443Z",
+  "updated": "2026-06-13T12:09:58.728Z",
   "chars": [
     {
       "name": "Jared de la Estirpe Aureus",
@@ -30,10 +30,10 @@
       "mot": "Cobrar lo que se le debe, saldar lo que debe, y que nadie vuelva a pillarle desprevenido."
     },
     {
-      "name": "La Forastera",
+      "name": "Daiki",
       "clase": "Superviviente",
       "raza": "Humana",
-      "desc": "Una joven campesina llegada esta misma noche, agotada y cubierta del polvo del camino. Cuenta que unos asaltantes quemaron la propiedad fronteriza donde vivía con sus padres, y que su padre, un ex-militar llamado Vinsmoke, le enseñó modales y disciplina. Carga una vieja lanza de la familia de la que no se separa... aunque ahora la custodia Jared.",
+      "desc": "Una joven campesina llegada esta misma noche, agotada y cubierta del polvo del camino. Cuenta que unos asaltantes quemaron la propiedad fronteriza donde vivía con sus padres, y que su padre, un ex-militar de apellido Vinsmoke, le enseñó modales y disciplina. Carga una vieja lanza de la familia de la que no se separa... aunque ahora la custodia Jared.",
       "mot": "Sobrevivir, encontrar un lugar seguro y recuperar lo único que le queda de su hogar."
     }
   ],
